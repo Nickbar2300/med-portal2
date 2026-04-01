@@ -1,0 +1,864 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg0: #0d1117;
+    --bg1: #161b22;
+    --bg2: #1c2333;
+    --bg3: #21262d;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text1: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --accent: #1f6feb;
+    --accent2: #388bfd;
+    --accent-glow: rgba(31,111,235,0.15);
+    --success: #3fb950;
+    --warn: #d29922;
+    --danger: #f85149;
+    --teal: #39d0c7;
+    --purple: #a371f7;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg0); color: var(--text1); min-height: 100vh; }
+
+  .screen { display: none; }
+  .screen.active { display: flex; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg0);
+    flex-direction: column;
+  }
+
+  .login-card {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 44px;
+    width: 380px;
+    max-width: 95vw;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+  .logo-name { font-size: 17px; font-weight: 600; color: var(--text1); letter-spacing: -0.3px; }
+  .logo-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+  .login-title { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .login-subtitle { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+
+  .field-label { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 6px; display: block; }
+
+  .field { margin-bottom: 18px; }
+
+  .field input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text1);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus { border-color: var(--accent2); }
+  .field input::placeholder { color: var(--text3); }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 4px;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: var(--accent2); }
+
+  .login-footer { text-align: center; margin-top: 20px; font-size: 12px; color: var(--text3); }
+  .login-footer a { color: var(--accent2); text-decoration: none; }
+
+  /* ── APP SHELL ── */
+  #app-screen {
+    flex-direction: row;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--bg1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 18px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    color: var(--text2);
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 0 8px;
+    transition: all 0.12s;
+    border: none; background: none; font-family: 'DM Sans', sans-serif; width: calc(100% - 16px); text-align: left;
+  }
+
+  .nav-item:hover { background: var(--bg3); color: var(--text1); }
+  .nav-item.active { background: var(--accent-glow); color: var(--accent2); border: 1px solid rgba(56,139,253,0.2); }
+
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .sidebar-spacer { flex: 1; }
+
+  .sidebar-user {
+    padding: 14px 18px 0;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: white; flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; }
+  .user-role { font-size: 11px; color: var(--text3); }
+
+  .logout-btn {
+    margin-left: auto;
+    background: none; border: none; cursor: pointer; color: var(--text3); padding: 4px;
+    border-radius: 4px;
+    transition: color 0.12s;
+  }
+  .logout-btn:hover { color: var(--danger); }
+
+  /* Main content */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg0);
+  }
+
+  .topbar {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg0);
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .page-title { font-size: 18px; font-weight: 600; }
+  .page-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .badge {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  /* Pages */
+  .page { display: none; padding: 28px; }
+  .page.active { display: block; }
+
+  /* Dashboard */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .stat-change { font-size: 12px; margin-top: 4px; }
+  .up { color: var(--success); }
+  .down { color: var(--danger); }
+  .neutral { color: var(--text3); }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title { font-size: 15px; font-weight: 500; }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+
+  .btn-ghost:hover { background: var(--bg3); color: var(--text1); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .panel {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .activity-text { font-size: 13.5px; line-height: 1.5; }
+  .activity-time { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .vital-card {
+    background: var(--bg2);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .vital-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .vital-value { font-size: 18px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .vital-unit { font-size: 11px; color: var(--text2); margin-left: 4px; }
+  .vital-status { font-size: 11px; margin-top: 3px; }
+
+  /* Records */
+  .records-filter {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+
+  .filter-btn:hover { border-color: var(--border2); color: var(--text1); }
+  .filter-btn.active { background: var(--accent-glow); border-color: rgba(56,139,253,0.3); color: var(--accent2); }
+
+  .records-table {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .rt-header {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr 80px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .rt-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr 80px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+
+  .rt-row:last-child { border-bottom: none; }
+  .rt-row:hover { background: var(--bg2); }
+
+  .rt-name { font-weight: 500; }
+  .rt-provider { color: var(--text2); }
+
+  .chip {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .chip-lab { background: rgba(57,208,199,0.12); color: var(--teal); }
+  .chip-visit { background: rgba(56,139,253,0.12); color: var(--accent2); }
+  .chip-img { background: rgba(163,113,247,0.12); color: var(--purple); }
+  .chip-rx { background: rgba(63,185,80,0.12); color: var(--success); }
+  .chip-note { background: rgba(210,153,34,0.12); color: var(--warn); }
+
+  .view-btn {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--accent2);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+  .view-btn:hover { background: var(--accent-glow); }
+
+  /* Record Detail Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--bg1);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    width: 540px;
+    max-width: 95vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+  }
+
+  .modal-header {
+    display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;
+  }
+
+  .modal-title { font-size: 17px; font-weight: 600; }
+  .modal-meta { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text2); font-size: 20px; line-height: 1; padding: 4px;
+    border-radius: 4px;
+    transition: color 0.12s;
+  }
+  .modal-close:hover { color: var(--text1); }
+
+  .detail-section { margin-bottom: 20px; }
+  .detail-section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 10px; }
+
+  .detail-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--text2); }
+  .detail-val { font-weight: 500; text-align: right; }
+
+  .result-bar-wrap { margin-top: 4px; }
+  .result-bar-bg {
+    height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; margin: 6px 0 2px;
+  }
+  .result-bar { height: 100%; border-radius: 3px; }
+</style>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen active">
+  <div class="login-card">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">MedRecord Portal</div>
+        <div class="logo-sub">Secure Patient Access</div>
+      </div>
+    </div>
+    <div class="login-title">Welcome back</div>
+    <div class="login-subtitle">Sign in to access your health records</div>
+    <div class="field">
+      <label class="field-label">Email address</label>
+      <input type="email" placeholder="patient@email.com" id="login-email" />
+    </div>
+    <div class="field">
+      <label class="field-label">Password</label>
+      <input type="password" placeholder="••••••••" id="login-pass" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Sign in</button>
+    <div class="login-footer">
+      <a href="#">Forgot password?</a> &nbsp;·&nbsp; <a href="#">Request access</a>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen">
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon" style="width:30px;height:30px;border-radius:8px;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:600;">MedRecord</div>
+        <div style="font-size:11px;color:var(--text3);">Patient Portal</div>
+      </div>
+    </div>
+
+    <button class="nav-item active" onclick="showPage('dashboard', this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('records', this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      Medical Records
+    </button>
+    <button class="nav-item" onclick="showPage('messages', this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      Messages
+    </button>
+    <button class="nav-item" onclick="showPage('profile', this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      My Profile
+    </button>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-user">
+      <div class="avatar">NB</div>
+      <div>
+        <div class="user-name">Nick B.</div>
+        <div class="user-role">Patient</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sign out">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- DASHBOARD PAGE -->
+    <div id="page-dashboard" class="page active">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Good morning, Nick — here's your health summary</div>
+        </div>
+        <div class="topbar-right">
+          <div class="badge">Last updated: Today, 8:14 AM</div>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Active Medications</div>
+            <div class="stat-value" style="color:var(--success);">3</div>
+            <div class="stat-change neutral">No changes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Recent Lab Results</div>
+            <div class="stat-value" style="color:var(--accent2);">7</div>
+            <div class="stat-change up">2 new this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Upcoming Visits</div>
+            <div class="stat-value" style="color:var(--teal);">2</div>
+            <div class="stat-change neutral">Next: Apr 14</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Unread Messages</div>
+            <div class="stat-value" style="color:var(--warn);">1</div>
+            <div class="stat-change down">From Dr. Rivera</div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel">
+            <div class="section-header">
+              <div class="section-title">Recent Activity</div>
+              <button class="btn-ghost">View all</button>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--teal);"></div>
+              <div>
+                <div class="activity-text">Lab results received — CBC Panel</div>
+                <div class="activity-time">Mar 28, 2026</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--accent2);"></div>
+              <div>
+                <div class="activity-text">Office visit — Dr. Sarah Rivera, MD</div>
+                <div class="activity-time">Mar 20, 2026</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--success);"></div>
+              <div>
+                <div class="activity-text">Prescription renewed — Lisinopril 10mg</div>
+                <div class="activity-time">Mar 18, 2026</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--purple);"></div>
+              <div>
+                <div class="activity-text">Radiology report uploaded — Chest X-ray</div>
+                <div class="activity-time">Feb 12, 2026</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-header">
+              <div class="section-title">Latest Vitals</div>
+              <div style="font-size:12px;color:var(--text3);">Mar 20, 2026</div>
+            </div>
+            <div class="vitals-grid">
+              <div class="vital-card">
+                <div class="vital-label">Blood Pressure</div>
+                <div class="vital-value">118<span class="vital-unit">/ 76 mmHg</span></div>
+                <div class="vital-status up">Normal</div>
+              </div>
+              <div class="vital-card">
+                <div class="vital-label">Heart Rate</div>
+                <div class="vital-value">72<span class="vital-unit">bpm</span></div>
+                <div class="vital-status up">Normal</div>
+              </div>
+              <div class="vital-card">
+                <div class="vital-label">Weight</div>
+                <div class="vital-value">194<span class="vital-unit">lbs</span></div>
+                <div class="vital-status neutral">Stable</div>
+              </div>
+              <div class="vital-card">
+                <div class="vital-label">BMI</div>
+                <div class="vital-value">27.1</div>
+                <div class="vital-status down">Overweight</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECORDS PAGE -->
+    <div id="page-records" class="page">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Medical Records</div>
+          <div class="page-sub">Complete history of your health records</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-ghost">Export records</button>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="records-filter">
+          <button class="filter-btn active" onclick="filterRecs('all',this)">All records</button>
+          <button class="filter-btn" onclick="filterRecs('lab',this)">Lab results</button>
+          <button class="filter-btn" onclick="filterRecs('visit',this)">Office visits</button>
+          <button class="filter-btn" onclick="filterRecs('img',this)">Imaging</button>
+          <button class="filter-btn" onclick="filterRecs('rx',this)">Prescriptions</button>
+        </div>
+
+        <div class="records-table">
+          <div class="rt-header">
+            <span>Record</span>
+            <span>Provider</span>
+            <span>Type</span>
+            <span>Date</span>
+            <span></span>
+          </div>
+
+          <div class="rt-row" data-type="lab" onclick="openRecord('CBC Panel','Dr. Sarah Rivera, MD','Lab Results','Mar 28, 2026','lab')">
+            <span class="rt-name">Complete Blood Count (CBC)</span>
+            <span class="rt-provider">Dr. Sarah Rivera</span>
+            <span><span class="chip chip-lab">Lab</span></span>
+            <span style="color:var(--text2);font-size:13px;">Mar 28, 2026</span>
+            <button class="view-btn">View</button>
+          </div>
+          <div class="rt-row" data-type="visit" onclick="openRecord('Office Visit','Dr. Sarah Rivera, MD','Visit Summary','Mar 20, 2026','visit')">
+            <span class="rt-name">Annual wellness visit</span>
+            <span class="rt-provider">Dr. Sarah Rivera</span>
+            <span><span class="chip chip-visit">Visit</span></span>
+            <span style="color:var(--text2);font-size:13px;">Mar 20, 2026</span>
+            <button class="view-btn">View</button>
+          </div>
+          <div class="rt-row" data-type="rx" onclick="openRecord('Lisinopril 10mg','Dr. Sarah Rivera, MD','Prescription','Mar 18, 2026','rx')">
+            <span class="rt-name">Lisinopril 10mg — renewal</span>
+            <span class="rt-provider">Dr. Sarah Rivera</span>
+            <span><span class="chip chip-rx">Rx</span></span>
+            <span style="color:var(--text2);font-size:13px;">Mar 18, 2026</span>
+            <button class="view-btn">View</button>
+          </div>
+          <div class="rt-row" data-type="img" onclick="openRecord('Chest X-Ray','Radiology Dept.','Imaging','Feb 12, 2026','img')">
+            <span class="rt-name">Chest X-ray — PA &amp; Lateral</span>
+            <span class="rt-provider">Radiology Dept.</span>
+            <span><span class="chip chip-img">Imaging</span></span>
+            <span style="color:var(--text2);font-size:13px;">Feb 12, 2026</span>
+            <button class="view-btn">View</button>
+          </div>
+          <div class="rt-row" data-type="lab" onclick="openRecord('Lipid Panel','Dr. Sarah Rivera, MD','Lab Results','Jan 15, 2026','lab')">
+            <span class="rt-name">Lipid panel</span>
+            <span class="rt-provider">Dr. Sarah Rivera</span>
+            <span><span class="chip chip-lab">Lab</span></span>
+            <span style="color:var(--text2);font-size:13px;">Jan 15, 2026</span>
+            <button class="view-btn">View</button>
+          </div>
+          <div class="rt-row" data-type="visit" onclick="openRecord('Follow-up Visit','Dr. James Park, MD','Visit Note','Dec 4, 2025','visit')">
+            <span class="rt-name">Follow-up — hypertension</span>
+            <span class="rt-provider">Dr. James Park</span>
+            <span><span class="chip chip-visit">Visit</span></span>
+            <span style="color:var(--text2);font-size:13px;">Dec 4, 2025</span>
+            <button class="view-btn">View</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES PAGE -->
+    <div id="page-messages" class="page">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Messages</div>
+          <div class="page-sub">Secure messaging with your care team</div>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="panel" style="max-width:600px;">
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--warn);width:10px;height:10px;"></div>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;">
+                <div class="activity-text" style="font-weight:500;">Dr. Sarah Rivera, MD</div>
+                <div style="font-size:12px;color:var(--text3);">Mar 29</div>
+              </div>
+              <div style="font-size:13px;color:var(--text2);margin-top:3px;">Re: CBC results — please review your latest labs and call if you have questions.</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--text3);width:10px;height:10px;"></div>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;">
+                <div class="activity-text" style="font-weight:500;">Care Team — Scheduling</div>
+                <div style="font-size:12px;color:var(--text3);">Mar 22</div>
+              </div>
+              <div style="font-size:13px;color:var(--text2);margin-top:3px;">Your appointment on Apr 14 at 10:00 AM has been confirmed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="page-profile" class="page">
+      <div class="topbar">
+        <div>
+          <div class="page-title">My Profile</div>
+          <div class="page-sub">Your personal and insurance information</div>
+        </div>
+      </div>
+      <div style="padding:28px;max-width:600px;">
+        <div class="panel">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+            <div class="avatar" style="width:52px;height:52px;font-size:18px;">NB</div>
+            <div>
+              <div style="font-size:17px;font-weight:600;">Nick B.</div>
+              <div style="font-size:13px;color:var(--text2);">Patient ID: #MR-00421</div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-title">Personal Information</div>
+            <div class="detail-row"><span class="detail-key">Date of birth</span><span class="detail-val">—</span></div>
+            <div class="detail-row"><span class="detail-key">Phone</span><span class="detail-val">—</span></div>
+            <div class="detail-row"><span class="detail-key">Address</span><span class="detail-val">Mechanicsburg, PA</span></div>
+            <div class="detail-row"><span class="detail-key">Primary care</span><span class="detail-val">Dr. Sarah Rivera, MD</span></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-title">Insurance</div>
+            <div class="detail-row"><span class="detail-key">Provider</span><span class="detail-val">—</span></div>
+            <div class="detail-row"><span class="detail-key">Member ID</span><span class="detail-val">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RECORD DETAIL MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">Record</div>
+        <div class="modal-meta" id="modal-meta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  function doLogin() {
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('app-screen').classList.add('active');
+  }
+
+  function doLogout() {
+    document.getElementById('app-screen').classList.remove('active');
+    document.getElementById('login-screen').classList.add('active');
+  }
+
+  function showPage(name, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function filterRecs(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.rt-row').forEach(r => {
+      r.style.display = (type === 'all' || r.dataset.type === type) ? 'grid' : 'none';
+    });
+  }
+
+  const recordData = {
+    lab: {
+      sections: [
+        { title: 'Test Results', rows: [
+          ['WBC', '6.8 K/uL', 'Normal'],
+          ['RBC', '4.9 M/uL', 'Normal'],
+          ['Hemoglobin', '14.8 g/dL', 'Normal'],
+          ['Hematocrit', '44.2 %', 'Normal'],
+          ['Platelets', '238 K/uL', 'Normal'],
+        ]}
+      ]
+    },
+    visit: {
+      sections: [
+        { title: 'Visit Details', rows: [
+          ['Reason', 'Annual wellness'],
+          ['BP at visit', '118/76 mmHg'],
+          ['Weight', '194 lbs'],
+          ['Assessment', 'Stable, well-controlled hypertension'],
+        ]}
+      ]
+    },
+    rx: {
+      sections: [
+        { title: 'Prescription', rows: [
+          ['Drug', 'Lisinopril 10mg'],
+          ['Directions', 'Take 1 tablet daily'],
+          ['Quantity', '90 tablets'],
+          ['Refills', '3 remaining'],
+          ['Pharmacy', 'CVS — Mechanicsburg, PA'],
+        ]}
+      ]
+    },
+    img: {
+      sections: [
+        { title: 'Radiology Report', rows: [
+          ['Study', 'Chest X-ray PA & Lateral'],
+          ['Finding', 'No acute cardiopulmonary process'],
+          ['Impression', 'Normal'],
+          ['Radiologist', 'Dr. James Park, MD'],
+        ]}
+      ]
+    }
+  };
+
+  function openRecord(title, provider, type, date, key) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-meta').textContent = provider + ' · ' + date + ' · ' + type;
+    const d = recordData[key];
+    let html = '';
+    d.sections.forEach(s => {
+      html += '<div class="detail-section"><div class="detail-section-title">' + s.title + '</div>';
+      s.rows.forEach(r => {
+        html += '<div class="detail-row"><span class="detail-key">' + r[0] + '</span><span class="detail-val">' + r[1] + (r[2] ? ' <span style="font-size:11px;color:var(--success);">· ' + r[2] + '</span>' : '') + '</span></div>';
+      });
+      html += '</div>';
+    });
+    document.getElementById('modal-body').innerHTML = html;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+</script>
