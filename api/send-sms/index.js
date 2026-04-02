@@ -19,7 +19,7 @@ module.exports = async function (context, req) {
   }
 
   const token = signingToken || Math.random().toString(36).substring(2) + Date.now().toString(36);
-  const signingUrl = `${portalUrl}/sign.html?token=${token}`;
+  const signingUrl = `${portalUrl}/sign.html?token=${token}&name=${encodeURIComponent(patientName || '')}&ref=${encodeURIComponent(caseRef || '')}`;
 
   let phone = toPhone.replace(/\D/g, '');
   if (phone.length === 10) phone = '1' + phone;
