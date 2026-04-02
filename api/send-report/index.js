@@ -1,3 +1,4 @@
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const crypto = require('crypto');
 
 module.exports = async function (context, req) {
