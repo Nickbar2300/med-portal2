@@ -1,0 +1,9 @@
+{
+  "name": "rapid-records-api",
+  "version": "1.0.0",
+  "description": "Rapid Records Azure Functions API",
+  "main": "index.js",
+  "dependencies": {
+    "@azure/storage-blob": "^12.17.0"
+  }
+}
