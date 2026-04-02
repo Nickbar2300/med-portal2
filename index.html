@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rapid Records — Marzzacco Niven & Associates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary:#1B2A4A;--brand-secondary:#C41E3A;--brand-accent:#C8962E;
+      --brand-light:#F4F6FA;--brand-surface:#FFFFFF;--brand-border:#DDE2EC;--brand-border2:#C8D0E0;
+      --brand-text1:#1B2A4A;--brand-text2:#5A6880;--brand-text3:#8C97AA;
+      --brand-success:#1A7F4B;--brand-warn:#C8962E;--brand-danger:#C41E3A;--brand-info:#1B5DAA;
+      --font-display:'Playfair Display',Georgia,serif;
+      --font-body:'Source Sans 3',sans-serif;
+      --font-mono:'Source Code Pro',monospace;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font-body);background:var(--brand-light);color:var(--brand-text1);min-height:100vh;font-size:15px;}
+    .screen{display:none;}.screen.active{display:flex;}
+    #login-screen{min-height:100vh;align-items:stretch;flex-direction:row;}
+    .login-hero{flex:1;background:var(--brand-primary);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:56px;position:relative;overflow:hidden;}
+    .login-hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(255,255,255,0.015) 40px,rgba(255,255,255,0.015) 80px);}
+    .login-hero-accent{width:56px;height:4px;background:var(--brand-secondary);margin-bottom:20px;border-radius:2px;}
+    .login-hero h1{font-family:var(--font-display);font-size:36px;color:white;line-height:1.2;margin-bottom:16px;position:relative;}
+    .login-hero p{font-size:15px;color:rgba(255,255,255,0.55);max-width:320px;line-height:1.7;position:relative;}
+    .login-hero-badge{position:absolute;top:48px;left:56px;display:flex;align-items:center;gap:10px;}
+    .rr-logo-mark{background:var(--brand-secondary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;color:white;letter-spacing:-1px;}
+    .rr-logo-text .rr-name{font-size:15px;font-weight:600;color:white;}
+    .rr-logo-text .rr-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:1px;}
+    .login-form-side{width:440px;background:var(--brand-surface);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 48px;}
+    .login-form-inner{width:100%;max-width:320px;}
+    .firm-name-display{font-family:var(--font-display);font-size:20px;color:var(--brand-primary);line-height:1.2;}
+    .firm-name-display .amp{color:var(--brand-secondary);}
+    .firm-sub{font-size:11px;color:var(--brand-accent);font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin:4px 0 2px;}
+    .firm-type{font-size:13px;color:var(--brand-text2);}
+    .login-divider{width:40px;height:2px;background:var(--brand-secondary);margin:20px 0;border-radius:1px;}
+    .field{margin-bottom:16px;}
+    .field-label{font-size:12px;font-weight:600;color:var(--brand-text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:block;}
+    .field input{width:100%;background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:8px;padding:11px 14px;font-size:14px;color:var(--brand-text1);font-family:var(--font-body);outline:none;transition:border-color 0.15s,box-shadow 0.15s;}
+    .field input:focus{border-color:var(--brand-primary);box-shadow:0 0 0 3px rgba(27,42,74,0.08);}
+    .field input::placeholder{color:var(--brand-text3);}
+    .btn-login{width:100%;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background 0.15s;letter-spacing:0.3px;}
+    .btn-login:hover{background:#253d6b;}
+    .login-footer-text{text-align:center;margin-top:20px;font-size:12px;color:var(--brand-text3);}
+    .login-footer-text a{color:var(--brand-info);text-decoration:none;}
+    .powered-by{position:absolute;bottom:24px;font-size:11px;color:rgba(255,255,255,0.3);}
+    .powered-by span{color:rgba(255,255,255,0.6);font-weight:600;}
+    #app-screen{flex-direction:row;min-height:100vh;}
+    .sidebar{width:240px;min-width:240px;background:var(--brand-primary);display:flex;flex-direction:column;padding:0;}
+    .sidebar-header{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
+    .nav-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.3);padding:16px 20px 6px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13.5px;color:rgba(255,255,255,0.6);cursor:pointer;border:none;background:none;font-family:var(--font-body);width:100%;text-align:left;transition:all 0.12s;border-left:3px solid transparent;}
+    .nav-item:hover{background:rgba(255,255,255,0.06);color:white;}
+    .nav-item.active{background:rgba(255,255,255,0.1);color:white;border-left-color:var(--brand-secondary);font-weight:600;}
+    .nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.7;}
+    .nav-item.active svg{opacity:1;}
+    .nav-badge{margin-left:auto;background:var(--brand-secondary);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;}
+    .sidebar-spacer{flex:1;}
+    .sidebar-user{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
+    .avatar{border-radius:50%;background:var(--brand-secondary);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;flex-shrink:0;}
+    .user-name{font-size:13px;font-weight:600;color:white;}
+    .user-role{font-size:11px;color:rgba(255,255,255,0.45);}
+    .logout-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.3);padding:4px;border-radius:4px;transition:color 0.12s;}
+    .logout-btn:hover{color:var(--brand-secondary);}
+    .main{flex:1;overflow-y:auto;background:var(--brand-light);}
+    .topbar{padding:18px 32px;background:var(--brand-surface);border-bottom:1px solid var(--brand-border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .page-title{font-size:19px;font-weight:600;}
+    .page-sub{font-size:13px;color:var(--brand-text2);margin-top:2px;}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .page{display:none;padding:32px;}.page.active{display:block;}
+    .card{background:var(--brand-surface);border:1px solid var(--brand-border);border-radius:12px;padding:24px;}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .card-title{font-size:14px;font-weight:600;}.card-sub{font-size:12px;color:var(--brand-text2);margin-top:2px;}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+    .stat-card{background:var(--brand-surface);border:1px solid var(--brand-border);border-radius:12px;padding:20px 22px;position:relative;overflow:hidden;}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .stat-card.blue::before{background:var(--brand-primary);}.stat-card.red::before{background:var(--brand-secondary);}.stat-card.gold::before{background:var(--brand-accent);}.stat-card.green::before{background:var(--brand-success);}
+    .stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+    .stat-icon svg{width:18px;height:18px;}
+    .stat-icon.blue{background:rgba(27,42,74,0.08);}.stat-icon.blue svg{fill:var(--brand-primary);}
+    .stat-icon.red{background:rgba(196,30,58,0.08);}.stat-icon.red svg{fill:var(--brand-secondary);}
+    .stat-icon.gold{background:rgba(200,150,46,0.1);}.stat-icon.gold svg{fill:var(--brand-accent);}
+    .stat-icon.green{background:rgba(26,127,75,0.08);}.stat-icon.green svg{fill:var(--brand-success);}
+    .stat-value{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--brand-text1);margin-bottom:4px;}
+    .stat-label{font-size:12px;color:var(--brand-text2);font-weight:500;}
+    .stat-delta{font-size:11px;margin-top:6px;}
+    .delta-flat{color:var(--brand-text3);}
+    .btn-primary{background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background 0.15s;}
+    .btn-primary:hover{background:#253d6b;}
+    .btn-danger{background:var(--brand-secondary);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background 0.15s;}
+    .btn-danger:hover{background:#a01830;}
+    .btn-ghost{background:none;border:1.5px solid var(--brand-border2);border-radius:8px;padding:8px 16px;font-size:13px;color:var(--brand-text2);cursor:pointer;font-family:var(--font-body);transition:all 0.12s;font-weight:500;}
+    .btn-ghost:hover{background:var(--brand-light);color:var(--brand-text1);border-color:var(--brand-primary);}
+    .chip{display:inline-block;border-radius:5px;padding:3px 9px;font-size:11px;font-weight:600;}
+    .chip-pending{background:rgba(200,150,46,0.12);color:#8A6010;}
+    .chip-progress{background:rgba(27,93,170,0.1);color:#1B5DAA;}
+    .chip-complete{background:rgba(26,127,75,0.1);color:var(--brand-success);}
+    .chip-signed{background:rgba(26,127,75,0.1);color:var(--brand-success);}
+    .chip-unsigned{background:rgba(196,30,58,0.08);color:var(--brand-secondary);}
+    .data-table{width:100%;border-collapse:collapse;}
+    .data-table th{padding:10px 16px;text-align:left;font-size:11px;color:var(--brand-text2);text-transform:uppercase;letter-spacing:0.6px;font-weight:600;border-bottom:2px solid var(--brand-border);background:var(--brand-light);}
+    .data-table td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--brand-border);color:var(--brand-text1);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr{cursor:pointer;transition:background 0.1s;}
+    .form-input{width:100%;background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--brand-text1);font-family:var(--font-body);outline:none;transition:border-color 0.15s,box-shadow 0.15s;}
+    .form-input:focus{border-color:var(--brand-primary);box-shadow:0 0 0 3px rgba(27,42,74,0.08);}
+    .form-input::placeholder{color:var(--brand-text3);}
+    .form-label{font-size:12px;font-weight:600;color:var(--brand-text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:block;}
+    .form-field{margin-bottom:18px;}
+    .steps{display:flex;align-items:center;gap:0;margin-bottom:32px;}
+    .step-item{display:flex;align-items:center;flex:1;}
+    .step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;border:2px solid var(--brand-border2);color:var(--brand-text3);background:var(--brand-surface);transition:all 0.2s;}
+    .step-circle.active{border-color:var(--brand-primary);color:white;background:var(--brand-primary);}
+    .step-circle.done{border-color:var(--brand-success);color:white;background:var(--brand-success);}
+    .step-label{font-size:12px;font-weight:500;color:var(--brand-text3);margin-left:8px;white-space:nowrap;}
+    .step-label.active{color:var(--brand-primary);font-weight:600;}
+    .step-label.done{color:var(--brand-success);}
+    .step-connector{flex:1;height:2px;background:var(--brand-border);margin:0 8px;}
+    .step-connector.done{background:var(--brand-success);}
+    .upload-zone{border:2px dashed var(--brand-border2);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--brand-light);}
+    .upload-zone:hover{border-color:var(--brand-primary);background:rgba(27,42,74,0.03);}
+    .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;}
+    .modal-backdrop.open{display:flex;}
+    .modal{background:var(--brand-surface);border-radius:14px;border:1px solid var(--brand-border);width:520px;max-width:95vw;max-height:85vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+    .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+    .modal-title{font-size:17px;font-weight:600;}.modal-meta{font-size:13px;color:var(--brand-text2);margin-top:3px;}
+    .modal-close{background:none;border:none;cursor:pointer;color:var(--brand-text2);font-size:22px;line-height:1;padding:2px 6px;border-radius:4px;transition:color 0.12s;}
+    .modal-close:hover{color:var(--brand-secondary);}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+    .section-gap{margin-bottom:24px;}
+    .detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brand-border);font-size:14px;}
+    .detail-row:last-child{border-bottom:none;}
+    .detail-key{color:var(--brand-text2);font-weight:500;}.detail-val{font-weight:600;text-align:right;}
+    .empty-state{text-align:center;padding:56px 24px;}
+    .empty-icon{font-size:40px;margin-bottom:16px;}
+    .empty-title{font-size:16px;font-weight:600;margin-bottom:8px;}
+    .empty-sub{font-size:13px;color:var(--brand-text2);margin-bottom:24px;}
+    .alert-banner{border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;font-size:13px;}
+    .alert-info{background:rgba(27,93,170,0.06);border:1px solid rgba(27,93,170,0.2);color:#1B5DAA;}
+    .alert-success{background:rgba(26,127,75,0.06);border:1px solid rgba(26,127,75,0.2);color:var(--brand-success);}
+    .alert-warn{background:rgba(200,150,46,0.08);border:1px solid rgba(200,150,46,0.25);color:#8A6010;}
+    .spinner{width:28px;height:28px;border:3px solid var(--brand-border);border-top-color:var(--brand-primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen active">
+  <div class="login-hero">
+    <div class="login-hero-badge">
+      <div class="rr-logo-mark" style="width:38px;height:38px;font-size:18px;">RR</div>
+      <div class="rr-logo-text"><div class="rr-name">Rapid Records</div><div class="rr-sub">Medical Records Portal</div></div>
+    </div>
+    <div class="login-hero-accent"></div>
+    <h1>Medicare Records.<br>Simplified.</h1>
+    <p>Secure, AI-powered medical record retrieval for legal professionals. HIPAA-compliant. CMS Blue Button 2.0 certified.</p>
+    <div class="powered-by">Powered by <span>Rapid Records</span></div>
+  </div>
+  <div class="login-form-side">
+    <div class="login-form-inner">
+      <div style="margin-bottom:28px;">
+        <img src="data:image/png;base64,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" alt="Marzzacco Niven & Associates" style="max-width:220px;height:auto;display:block;"/>
+      </div>
+      <div class="login-divider"></div>
+      <div style="font-size:22px;font-weight:600;margin-bottom:6px;">Sign in to your account</div>
+      <div style="font-size:13px;color:var(--brand-text2);margin-bottom:28px;">Access your medical records portal</div>
+      <div class="field"><label class="field-label">Email address</label><input type="email" id="login-email" placeholder="you@klnivenlaw.com"/></div>
+      <div class="field"><label class="field-label">Password</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
+      <button class="btn-login" onclick="doLogin()">Sign in to Portal</button>
+      <div class="login-footer-text"><a href="#">Forgot password?</a> &nbsp;·&nbsp; <a href="#">Contact support</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen">
+  <nav class="sidebar">
+    <div class="sidebar-header" style="padding:14px 16px;">
+      <div style="background:white;border-radius:8px;padding:7px 10px;display:flex;align-items:center;justify-content:center;width:100%;">
+        <img src="data:image/png;base64,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" alt="Marzzacco Niven & Associates" style="max-width:160px;height:auto;display:block;"/>
+      </div>
+    </div>
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" onclick="showPage('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('new-request',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>New Record Request
+    </button>
+    <button class="nav-item" id="nav-my-requests" onclick="showPage('my-requests',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>My Requests
+      <span class="nav-badge" id="reports-ready-badge" style="display:none;">0</span>
+    </button>
+
+    <div class="nav-section-label">Account</div>
+    <button class="nav-item" onclick="showPage('account',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>My Account
+    </button>
+    <button class="nav-item" onclick="showPage('profile',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>My Profile
+    </button>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebar-avatar" style="width:34px;height:34px;font-size:12px;">AD</div>
+      <div><div class="user-name" id="sidebar-name">Admin User</div><div class="user-role">Administrator</div></div>
+      <button class="logout-btn" onclick="doLogout()" title="Sign out"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></button>
+    </div>
+  </nav>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="topbar">
+        <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-greeting">Welcome back — here's your activity overview</div></div>
+      </div>
+      <div style="padding:32px;">
+
+        <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card blue"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div><div class="stat-value">0</div><div class="stat-label">Requests This Month</div><div class="stat-delta delta-flat">No requests yet</div></div>
+          <div class="stat-card red"><div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div><div class="stat-value">0</div><div class="stat-label">Reports Generated</div><div class="stat-delta delta-flat">No reports yet</div></div>
+          <div class="stat-card gold"><div class="stat-icon gold"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div><div class="stat-value">0</div><div class="stat-label">Pending Requests</div><div class="stat-delta delta-flat">All clear</div></div>
+
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Recent Requests</div><div class="card-sub">Your latest record requests</div></div><button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="showPage('my-requests',document.querySelector('[onclick*=my-requests]'))">View all</button></div>
+            <div class="empty-state" style="padding:32px 16px;"><div class="empty-icon">📋</div><div class="empty-title" style="font-size:14px;">No requests yet</div><div class="empty-sub" style="font-size:12px;">Submit your first record request to get started</div><button class="btn-primary" style="font-size:12px;padding:8px 16px;" onclick="showPage('new-request',document.querySelector('[onclick*=new-request]'))">+ New Request</button></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Quick Actions</div></div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <button onclick="showPage('new-request',document.querySelector('[onclick*=new-request]'))" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:8px;cursor:pointer;font-family:var(--font-body);transition:all 0.12s;text-align:left;" onmouseover="this.style.borderColor='var(--brand-primary)'" onmouseout="this.style.borderColor='var(--brand-border)'">
+                  <div style="width:32px;height:32px;background:rgba(27,42,74,0.08);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="var(--brand-primary)" style="width:16px;height:16px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:600;">New Record Request</div><div style="font-size:11px;color:var(--brand-text2);">Pull Medicare records for a patient</div></div>
+                </button>
+                <button onclick="showPage('report',document.querySelector('[onclick*=report]'))" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:8px;cursor:pointer;font-family:var(--font-body);transition:all 0.12s;text-align:left;" onmouseover="this.style.borderColor='var(--brand-secondary)'" onmouseout="this.style.borderColor='var(--brand-border)'">
+                  <div style="width:32px;height:32px;background:rgba(196,30,58,0.08);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="var(--brand-secondary)" style="width:16px;height:16px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:600;">Generate AI Report</div><div style="font-size:11px;color:var(--brand-text2);">Create a summary with full detail</div></div>
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">This Month</div><div class="card-sub" id="billing-month">April 2026</div></div>
+              <div class="detail-row"><span class="detail-key">Requests</span><span class="detail-val">0</span></div>
+              <div class="detail-row"><span class="detail-key">Reports generated</span><span class="detail-val">0</span></div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW RECORD REQUEST -->
+    <div id="page-new-request" class="page">
+      <div class="topbar"><div><div class="page-title">New Record Request</div><div class="page-sub">Complete all steps to pull Medicare records for a patient</div></div></div>
+      <div style="padding:32px;max-width:760px;">
+        <div class="steps">
+          <div class="step-item"><div class="step-circle active" id="step1-circle">1</div><div class="step-label active" id="step1-label">HIPAA Form</div></div>
+          <div class="step-connector" id="conn1"></div>
+          <div class="step-item"><div class="step-circle" id="step2-circle">2</div><div class="step-label" id="step2-label">Patient Info</div></div>
+          <div class="step-connector" id="conn2"></div>
+          <div class="step-item"><div class="step-circle" id="step3-circle">3</div><div class="step-label" id="step3-label">Identity Verification</div></div>
+          <div class="step-connector" id="conn3"></div>
+          <div class="step-item"><div class="step-circle" id="step4-circle">4</div><div class="step-label" id="step4-label">Records Pulled</div></div>
+        </div>
+        <!-- Step 1 -->
+        <div id="req-step1" class="card">
+          <div class="card-header"><div><div class="card-title">Step 1 — HIPAA Authorization</div><div class="card-sub">Send the patient a mobile-friendly signing link or upload a signed form</div></div></div>
+          <div class="three-col">
+            <div class="form-field"><label class="form-label">First Name</label><input type="text" id="req-first" class="form-input" placeholder="First name"/></div>
+            <div class="form-field"><label class="form-label">Last Name</label><input type="text" id="req-last" class="form-input" placeholder="Last name"/></div>
+            <div class="form-field"><label class="form-label">Date of Birth</label><input type="date" id="req-dob" class="form-input" style="color-scheme:light;"/></div>
+          </div>
+          <div class="two-col">
+            <div class="form-field"><label class="form-label">Patient Phone</label><input type="tel" id="req-phone" class="form-input" placeholder="(555) 000-0000"/></div>
+            <div class="form-field"><label class="form-label">Patient Email</label><input type="email" id="req-email" class="form-input" placeholder="patient@email.com"/></div>
+          </div>
+          <div class="two-col">
+            <div class="form-field"><label class="form-label">Records From</label><input type="date" id="req-from" class="form-input" style="color-scheme:light;"/></div>
+            <div class="form-field"><label class="form-label">Records To</label><input type="date" id="req-to" class="form-input" style="color-scheme:light;"/></div>
+          </div>
+          <div class="form-field"><label class="form-label">Case / Matter Reference (optional)</label><input type="text" id="req-case" class="form-input" placeholder="e.g. Case #2024-1234"/></div>
+          <button class="btn-primary" onclick="goStep(2)">Continue to Patient Info →</button>
+        </div>
+        <!-- Step 2 -->
+        <div id="req-step2" class="card" style="display:none;">
+          <div class="card-header"><div><div class="card-title">Step 2 — Patient Information</div><div class="card-sub">Enter the patient's details and requested record date range</div></div></div>
+          <div class="alert-info alert-banner"><svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><span>SMS delivery is live via Twilio — enter patient phone in Step 1, then send the signing link. Email delivery and CLEAR identity verification are coming soon.</span></div>
+          <div class="two-col" style="margin-bottom:20px;">
+            <div class="card" style="border:1.5px solid var(--brand-border2);">
+              <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📱 Send Mobile Signing Link</div>
+              <div style="font-size:12px;color:var(--brand-text2);margin-bottom:14px;line-height:1.6;">Patient receives a link via SMS or email to sign the HIPAA form on their phone.</div>
+              <div class="form-field" style="margin-bottom:10px;"><label class="form-label">Send via</label><select id="hipaa-send-method" class="form-input" style="cursor:pointer;"><option value="both">SMS + Email</option><option value="sms">SMS only</option><option value="email">Email only</option></select></div>
+              <button class="btn-primary" style="width:100%;font-size:13px;" onclick="sendHipaaLink()">Send Signing Link</button>
+              <div id="hipaa-send-status" style="font-size:12px;margin-top:8px;text-align:center;"></div>
+            </div>
+            <div class="card" style="border:1.5px solid var(--brand-border2);">
+              <div style="font-size:13px;font-weight:600;margin-bottom:8px;">📎 Upload Signed Form</div>
+              <div style="font-size:12px;color:var(--brand-text2);margin-bottom:14px;line-height:1.6;">Already have a signed HIPAA form? Upload it here as PDF or image.</div>
+              <div class="upload-zone" onclick="document.getElementById('hipaa-file-input').click()"><svg viewBox="0 0 24 24" fill="var(--brand-text3)" style="width:28px;height:28px;margin:0 auto 8px;display:block;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg><div style="font-size:13px;font-weight:500;color:var(--brand-text2);">Click to upload</div><div style="font-size:11px;color:var(--brand-text3);margin-top:4px;">PDF, JPG, PNG — max 10MB</div></div>
+              <input type="file" id="hipaa-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleHipaaUpload(this)"/>
+              <div id="hipaa-upload-status" style="font-size:12px;margin-top:8px;"></div>
+            </div>
+          </div>
+          <div id="hipaa-signed-confirm" style="display:none;" class="alert-success alert-banner"><svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;flex-shrink:0;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>HIPAA form signed and stored. You can now proceed to Medicare verification.</span></div>
+          <div style="display:flex;gap:10px;margin-top:8px;"><button class="btn-ghost" onclick="goStep(1)">← Back</button><button class="btn-primary" id="step2-next" onclick="goStep(3)" style="opacity:0.4;pointer-events:none;">Continue to Identity Verification →</button></div>
+        </div>
+        <!-- Step 3 -->
+        <div id="req-step3" class="card" style="display:none;">
+          <div class="card-header"><div><div class="card-title">Step 3 — Medicare Verification</div><div class="card-sub">Authorize Medicare access for this patient's records</div></div></div>
+          <div class="alert-warn alert-banner"><svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><span>Sandbox mode: use <strong>BBUser00000</strong> / <strong>PW00000!</strong> — CLEAR identity verification coming soon.</span></div>
+          <div style="background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:10px;padding:24px;text-align:center;margin-bottom:20px;">
+            <div style="width:56px;height:56px;background:rgba(27,42,74,0.08);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg viewBox="0 0 24 24" fill="var(--brand-primary)" style="width:28px;height:28px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+            <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Authorize Medicare Access</div>
+            <div style="font-size:13px;color:var(--brand-text2);margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6;">The patient will be redirected to Medicare.gov to authorize this firm's access to their records.</div>
+            <button class="btn-primary" onclick="connectMedicare()" style="font-size:14px;padding:12px 28px;">Launch Medicare Authorization →</button>
+          </div>
+          <div style="display:flex;gap:10px;"><button class="btn-ghost" onclick="goStep(2)">← Back</button></div>
+        </div>
+        <!-- Step 4 -->
+        <div id="req-step4" class="card" style="display:none;">
+          <div style="text-align:center;padding:32px 16px;">
+            <div style="width:64px;height:64px;background:rgba(26,127,75,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><svg viewBox="0 0 24 24" fill="var(--brand-success)" style="width:32px;height:32px;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div style="font-size:20px;font-weight:700;margin-bottom:8px;">Records Connected!</div>
+            <div style="font-size:14px;color:var(--brand-text2);margin-bottom:28px;line-height:1.6;max-width:400px;margin-left:auto;margin-right:auto;">Medicare has been authorized. Navigate to <strong>Medicare Data</strong> to view records or <strong>Medical Record Report</strong> to generate an AI-powered summary.</div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn-primary" onclick="showPage('medicare',document.querySelector('[onclick*=medicare]'))">View Medicare Data →</button>
+              <button class="btn-ghost" onclick="showPage('report',document.querySelector('[onclick*=report]'))">Generate Report →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY REQUESTS -->
+    <div id="page-my-requests" class="page">
+      <div class="topbar">
+        <div><div class="page-title">My Requests</div><div class="page-sub">All record requests and case files</div></div>
+        <div class="topbar-right"><button class="btn-primary" onclick="showPage('new-request',document.querySelector('[onclick*=new-request]'))">+ New Request</button></div>
+      </div>
+      <div style="padding:32px;" id="requests-list-view">
+        <div id="requests-table-wrap">
+          <div class="card" id="requests-empty-state">
+            <div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">No requests yet</div><div class="empty-sub">Your submitted record requests will appear here with status, HIPAA signing status, and AI report availability.</div><button class="btn-primary" onclick="showPage('new-request',document.querySelector('[onclick*=new-request]'))">Submit Your First Request</button></div>
+          </div>
+          <div id="requests-table-container" style="display:none;">
+            <div class="card" style="padding:0;overflow:hidden;">
+              <table class="data-table" id="requests-table">
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Case Ref</th>
+                    <th>Date Submitted</th>
+                    <th>HIPAA</th>
+                    <th>Medicare</th>
+                    <th>Report</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="requests-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE DETAIL VIEW (hidden until row clicked) -->
+      <div id="case-detail-view" style="display:none;padding:32px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+          <button class="btn-ghost" onclick="closeCaseDetail()" style="display:flex;align-items:center;gap:6px;font-size:13px;">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            Back to My Requests
+          </button>
+          <div style="font-size:18px;font-weight:700;" id="case-detail-name">Case Detail</div>
+          <span id="case-detail-status-chip" class="chip chip-pending" style="margin-left:4px;"></span>
+        </div>
+
+        <!-- Case meta bar -->
+        <div class="card section-gap" style="padding:16px 20px;">
+          <div style="display:flex;gap:32px;flex-wrap:wrap;">
+            <div><div style="font-size:11px;color:var(--brand-text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Patient</div><div style="font-size:14px;font-weight:600;" id="cd-patient">—</div></div>
+            <div><div style="font-size:11px;color:var(--brand-text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Case Ref</div><div style="font-size:14px;font-weight:600;" id="cd-caseref">—</div></div>
+            <div><div style="font-size:11px;color:var(--brand-text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Submitted</div><div style="font-size:14px;font-weight:600;" id="cd-submitted">—</div></div>
+            <div><div style="font-size:11px;color:var(--brand-text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">DOB</div><div style="font-size:14px;font-weight:600;" id="cd-dob">—</div></div>
+            <div><div style="font-size:11px;color:var(--brand-text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Records Period</div><div style="font-size:14px;font-weight:600;" id="cd-period">—</div></div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;gap:0;border-bottom:2px solid var(--brand-border);margin-bottom:24px;">
+          <button class="case-tab active" id="tab-overview"   onclick="switchTab('overview')"  style="padding:10px 20px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;font-family:var(--font-body);border-bottom:2px solid var(--brand-primary);margin-bottom:-2px;color:var(--brand-primary);">Overview</button>
+          <button class="case-tab"        id="tab-medicare"  onclick="switchTab('medicare')"  style="padding:10px 20px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;font-family:var(--font-body);border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--brand-text2);">Medicare Data</button>
+          <button class="case-tab"        id="tab-report"    onclick="switchTab('report')"    style="padding:10px 20px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;font-family:var(--font-body);border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--brand-text2);">AI Report</button>
+          <button class="case-tab"        id="tab-hipaa"     onclick="switchTab('hipaa')"     style="padding:10px 20px;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;font-family:var(--font-body);border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--brand-text2);">HIPAA Status</button>
+        </div>
+
+        <!-- Tab: Overview -->
+        <div id="tab-content-overview">
+          <div class="three-col section-gap">
+            <div class="stat-card blue"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div><div class="stat-value" id="cd-claim-count">—</div><div class="stat-label">Total Claims</div></div>
+            <div class="stat-card gold"><div class="stat-icon gold"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div><div class="stat-value" id="cd-total-billed">—</div><div class="stat-label">Total Billed</div></div>
+            <div class="stat-card green"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><div class="stat-value" id="cd-total-paid">—</div><div class="stat-label">Total Paid</div></div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px;">Case Timeline</div>
+              <div id="cd-timeline"></div>
+            </div>
+            <div class="card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px;">Quick Actions</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <button onclick="switchTab('medicare')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:8px;cursor:pointer;font-family:var(--font-body);text-align:left;" onmouseover="this.style.borderColor='var(--brand-primary)'" onmouseout="this.style.borderColor='var(--brand-border)'">
+                  <div style="width:28px;height:28px;background:rgba(27,42,74,0.08);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="var(--brand-primary)" style="width:14px;height:14px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:600;">View Medicare Data</div><div style="font-size:11px;color:var(--brand-text2);">Claims, coverage, patient info</div></div>
+                </button>
+                <button onclick="switchTab('report');loadCaseReport();" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--brand-light);border:1.5px solid var(--brand-border);border-radius:8px;cursor:pointer;font-family:var(--font-body);text-align:left;" onmouseover="this.style.borderColor='var(--brand-secondary)'" onmouseout="this.style.borderColor='var(--brand-border)'">
+                  <div style="width:28px;height:28px;background:rgba(196,30,58,0.08);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="var(--brand-secondary)" style="width:14px;height:14px;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg></div>
+                  <div><div style="font-size:13px;font-weight:600;">Generate AI Report</div><div style="font-size:11px;color:var(--brand-text2);">AI-powered medical summary + PDF</div></div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Medicare Data -->
+        <div id="tab-content-medicare" style="display:none;">
+          <div id="case-medicare-content"><div style="text-align:center;padding:40px;color:var(--brand-text2);font-size:14px;">Connect Medicare to view claims data for this case.</div></div>
+        </div>
+
+        <!-- Tab: AI Report -->
+        <div id="tab-content-report" style="display:none;">
+          <div class="card section-gap">
+            <div class="card-header">
+              <div><div class="card-title">Report Parameters</div></div>
+            </div>
+            <div class="two-col" style="margin-bottom:16px;">
+              <div class="form-field"><label class="form-label">Date From</label><input type="date" id="cd-rpt-from" class="form-input" style="color-scheme:light;"/></div>
+              <div class="form-field"><label class="form-label">Date To</label><input type="date" id="cd-rpt-to" class="form-input" style="color-scheme:light;"/></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <button class="btn-primary" onclick="loadCaseReport()">Generate AI Report</button>
+              <span id="cd-rpt-status" style="font-size:13px;color:var(--brand-text2);"></span>
+            </div>
+          </div>
+          <div id="case-report-output" style="display:none;">
+            <div class="card section-gap" style="border-top:3px solid var(--brand-primary);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+                <div><div style="font-size:16px;font-weight:700;font-family:var(--font-display);">AI-Generated Medical Summary</div><div style="font-size:13px;color:var(--brand-text2);margin-top:3px;" id="cd-rpt-header-sub">—</div></div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn-ghost" onclick="exportCasePDF()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Download PDF</button>
+                  <button class="btn-danger" onclick="showEmailModal()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>Send Secure Link</button>
+                </div>
+              </div>
+              <div style="background:var(--brand-light);border-radius:10px;padding:18px;margin-bottom:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:8px;">Overview</div><div style="font-size:14px;line-height:1.7;" id="cd-rpt-overview">—</div></div>
+              <div class="two-col" style="margin-bottom:16px;">
+                <div style="background:var(--brand-light);border-radius:10px;padding:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:10px;">Care Highlights</div><ul id="cd-rpt-highlights" style="list-style:none;padding:0;font-size:13px;line-height:1.9;"></ul></div>
+                <div style="background:var(--brand-light);border-radius:10px;padding:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:8px;">Cost Summary</div><div style="font-size:13px;line-height:1.7;" id="cd-rpt-cost">—</div></div>
+              </div>
+              <div style="background:rgba(200,150,46,0.08);border:1px solid rgba(200,150,46,0.25);border-radius:8px;padding:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-accent);margin-bottom:6px;">Administrator Note</div><div style="font-size:13px;line-height:1.6;" id="cd-rpt-recommendations">—</div></div>
+            </div>
+            <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:16px;">Claims Detail <span id="cd-rpt-claim-count" style="font-size:12px;background:var(--brand-light);color:var(--brand-text2);padding:2px 8px;border-radius:4px;border:1px solid var(--brand-border);margin-left:8px;"></span></div>
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Provider</th><th style="text-align:right;">Billed</th><th style="text-align:right;">Paid</th><th>Dx Codes</th></tr></thead><tbody id="cd-rpt-claims-tbody"></tbody></table></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: HIPAA Status -->
+        <div id="tab-content-hipaa" style="display:none;">
+          <div class="card">
+            <div style="font-size:14px;font-weight:600;margin-bottom:20px;">HIPAA Authorization Status</div>
+            <div id="cd-hipaa-status-content">
+              <div class="detail-row"><span class="detail-key">Signing link sent</span><span class="detail-val" id="cd-hipaa-sent">—</span></div>
+              <div class="detail-row"><span class="detail-key">Patient signed</span><span class="detail-val" id="cd-hipaa-signed">—</span></div>
+              <div class="detail-row"><span class="detail-key">Signed at</span><span class="detail-val" id="cd-hipaa-signed-at">—</span></div>
+              <div class="detail-row"><span class="detail-key">Method</span><span class="detail-val" id="cd-hipaa-method">—</span></div>
+            </div>
+            <div style="margin-top:20px;">
+              <button class="btn-ghost" onclick="resendHipaaLink()" style="font-size:13px;">Resend Signing Link</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /case-detail-view -->
+    </div>
+
+    <!-- MEDICARE DATA -->
+    <div id="page-medicare" class="page">
+      <div class="topbar"><div><div class="page-title">Medicare Data</div><div class="page-sub">Imported from CMS Blue Button 2.0</div></div><div class="topbar-right"><button class="btn-ghost" onclick="connectMedicare()">Reconnect</button></div></div>
+      <div style="padding:32px;" id="medicare-page-content"><div class="card"><div class="empty-state"><div class="empty-icon">🔗</div><div class="empty-title">No Medicare data connected</div><div class="empty-sub">Connect Medicare from the Dashboard or start a New Record Request.</div><button class="btn-primary" onclick="connectMedicare()">Connect Medicare</button></div></div></div>
+    </div>
+
+    <!-- MEDICAL RECORD REPORT -->
+    <div id="page-report" class="page">
+      <div class="topbar"><div><div class="page-title">Medical Record Report</div><div class="page-sub">AI-generated summary with full claims detail</div></div></div>
+      <div style="padding:32px;max-width:920px;">
+        <div class="card section-gap">
+          <div class="card-header"><div class="card-title">Report Parameters</div></div>
+          <div class="three-col" style="margin-bottom:16px;">
+            <div class="form-field"><label class="form-label">Patient Name</label><input type="text" id="rpt-patient-name" class="form-input" placeholder="Full name"/></div>
+            <div class="form-field"><label class="form-label">Date From</label><input type="date" id="rpt-date-from" class="form-input" style="color-scheme:light;"/></div>
+            <div class="form-field"><label class="form-label">Date To</label><input type="date" id="rpt-date-to" class="form-input" style="color-scheme:light;"/></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <button class="btn-primary" onclick="generateReport()">Generate AI Report</button>
+            <span id="rpt-status" style="font-size:13px;color:var(--brand-text2);"></span>
+          </div>
+        </div>
+        <div id="report-output" style="display:none;">
+          <div class="card section-gap" style="border-top:3px solid var(--brand-primary);">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+              <div><div style="font-size:16px;font-weight:700;font-family:var(--font-display);">AI-Generated Medical Summary</div><div style="font-size:13px;color:var(--brand-text2);margin-top:3px;" id="rpt-header-sub">—</div></div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-ghost" onclick="exportPDF()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Download PDF</button>
+                <button class="btn-danger" onclick="showEmailModal()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>Send Secure Link</button>
+              </div>
+            </div>
+            <div style="background:var(--brand-light);border-radius:10px;padding:18px;margin-bottom:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:8px;">Overview</div><div style="font-size:14px;line-height:1.7;" id="rpt-overview">—</div></div>
+            <div class="two-col" style="margin-bottom:16px;">
+              <div style="background:var(--brand-light);border-radius:10px;padding:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:10px;">Care Highlights</div><ul id="rpt-highlights" style="list-style:none;padding:0;font-size:13px;line-height:1.9;"></ul></div>
+              <div style="background:var(--brand-light);border-radius:10px;padding:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:8px;">Providers & Services</div><div style="font-size:13px;line-height:1.7;" id="rpt-providers">—</div></div>
+            </div>
+            <div class="two-col" style="margin-bottom:16px;">
+              <div style="background:var(--brand-light);border-radius:10px;padding:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:8px;">Cost Summary</div><div style="font-size:13px;line-height:1.7;" id="rpt-cost">—</div></div>
+              <div style="background:var(--brand-light);border-radius:10px;padding:16px;"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-text3);margin-bottom:8px;">Diagnoses</div><div style="font-size:13px;line-height:1.7;" id="rpt-diagnoses">—</div></div>
+            </div>
+            <div style="background:rgba(200,150,46,0.08);border:1px solid rgba(200,150,46,0.25);border-radius:8px;padding:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-accent);margin-bottom:6px;">Administrator Note</div><div style="font-size:13px;line-height:1.6;" id="rpt-recommendations">—</div></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><div style="font-size:14px;font-weight:600;">Claims Detail <span id="rpt-claim-count" style="font-size:12px;background:var(--brand-light);color:var(--brand-text2);padding:2px 8px;border-radius:4px;border:1px solid var(--brand-border);margin-left:8px;"></span></div></div>
+            <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Provider</th><th style="text-align:right;">Billed</th><th style="text-align:right;">Paid</th><th>Dx Codes</th></tr></thead><tbody id="rpt-claims-tbody"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY ACCOUNT -->
+    <div id="page-account" class="page">
+      <div class="topbar"><div><div class="page-title">My Account</div><div class="page-sub">Usage, billing, and invoices</div></div><div class="topbar-right"><button class="btn-ghost" onclick="exportInvoice()">Download Invoice</button></div></div>
+      <div style="padding:32px;max-width:760px;">
+        <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px;">
+          <div class="stat-card blue"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div><div class="stat-value">0</div><div class="stat-label">Requests This Month</div></div>
+          <div class="stat-card gold"><div class="stat-icon gold"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div><div class="stat-value">$0.00</div><div class="stat-label">Amount Due</div></div>
+          <div class="stat-card green"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><div class="stat-value">Pay-Go</div><div class="stat-label">Billing Plan</div></div>
+        </div>
+        <div class="card section-gap"><div class="card-header"><div class="card-title">Pricing</div></div>
+          <div class="detail-row"><span class="detail-key">Per record request</span><span class="detail-val">Contact Rapid Records</span></div>
+          <div class="detail-row"><span class="detail-key">AI summary report</span><span class="detail-val">Included</span></div>
+          <div class="detail-row"><span class="detail-key">PDF export</span><span class="detail-val">Included</span></div>
+          <div class="detail-row"><span class="detail-key">Secure link delivery</span><span class="detail-val">Included</span></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">Invoice History</div></div><div class="empty-state" style="padding:32px 16px;"><div class="empty-icon">🧾</div><div class="empty-title" style="font-size:14px;">No invoices yet</div><div class="empty-sub" style="font-size:12px;">Invoices will appear here once you have submitted record requests.</div></div></div>
+      </div>
+    </div>
+
+    <!-- MY PROFILE -->
+    <div id="page-profile" class="page">
+      <div class="topbar"><div><div class="page-title">My Profile</div><div class="page-sub">Your account and firm information</div></div></div>
+      <div style="padding:32px;max-width:600px;">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--brand-border);">
+            <div class="avatar" style="width:56px;height:56px;font-size:20px;background:var(--brand-primary);">AD</div>
+            <div><div style="font-size:18px;font-weight:700;">Admin User</div><div style="font-size:13px;color:var(--brand-text2);">Administrator · Marzzacco Niven & Associates</div></div>
+          </div>
+          <div class="detail-row"><span class="detail-key">Firm</span><span class="detail-val">Marzzacco Niven & Associates</span></div>
+          <div class="detail-row"><span class="detail-key">Location</span><span class="detail-val">Harrisburg, PA</span></div>
+          <div class="detail-row"><span class="detail-key">Portal access</span><span class="detail-val" style="color:var(--brand-success);">Active</span></div>
+          <div class="detail-row"><span class="detail-key">Plan</span><span class="detail-val">Pay-as-you-go</span></div>
+          <div class="detail-row"><span class="detail-key">Powered by</span><span class="detail-val" style="color:var(--brand-secondary);font-weight:700;">Rapid Records</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-backdrop" id="email-modal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header"><div><div class="modal-title">Send Secure Report Link</div><div class="modal-meta">Patient receives a 48-hour access link</div></div><button class="modal-close" onclick="closeEmailModal()">×</button></div>
+    <div class="form-field"><label class="form-label">Recipient Email</label><input type="email" id="send-email-addr" class="form-input" placeholder="patient@email.com"/></div>
+    <button class="btn-primary" style="width:100%;" onclick="sendReportEmail()">Send Link</button>
+    <div id="email-send-status" style="margin-top:12px;font-size:13px;text-align:center;"></div>
+  </div>
+</div>
+
+<script>
+  const TENANT={firmName:'Marzzacco Niven & Associates',firmShort:'Marzzacco Niven',location:'Harrisburg, PA',adminName:'Admin User',adminInitials:'AD'};
+  const BB2={clientId:'UwNiGhAHrbvnvFWb4ggp7BA2T1uIW7bOPdaM6Nzm',redirectUri:'https://glowing-pavlova-dea557.netlify.app/callback.html',authUrl:'https://sandbox.bluebutton.cms.gov/v2/o/authorize/',scope:'openid profile patient/Patient.rs patient/Coverage.rs patient/ExplanationOfBenefit.rs'};
+  document.getElementById('sidebar-name').textContent=TENANT.adminName;
+  document.getElementById('sidebar-avatar').textContent=TENANT.adminInitials;
+  document.getElementById('billing-month').textContent=new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  function doLogin(){sessionStorage.setItem('portal_authed','true');document.getElementById('login-screen').classList.remove('active');document.getElementById('app-screen').classList.add('active');checkMedicareReturn();const hr=new Date().getHours();const g=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';document.getElementById('dash-greeting').textContent=`${g}, ${TENANT.adminName.split(' ')[0]} — here's your activity overview`;}
+  function doLogout(){sessionStorage.removeItem('portal_authed');sessionStorage.removeItem('bb2_access_token');sessionStorage.removeItem('bb2_connected');document.getElementById('app-screen').classList.remove('active');document.getElementById('login-screen').classList.add('active');}
+  function showPage(name,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');if(btn)btn.classList.add('active');}
+  let currentStep=1;
+  function goStep(n){for(let i=1;i<=4;i++){const el=document.getElementById('req-step'+i);if(el)el.style.display=i===n?'block':'none';const c=document.getElementById('step'+i+'-circle');const l=document.getElementById('step'+i+'-label');if(c&&l){if(i<n){c.className='step-circle done';l.className='step-label done';}if(i===n){c.className='step-circle active';l.className='step-label active';}if(i>n){c.className='step-circle';l.className='step-label';}const conn=document.getElementById('conn'+i);if(conn)conn.className='step-connector'+(i<n?' done':'');}}currentStep=n;
+    if(n===4){
+      const req={patientFirst:(document.getElementById('req-first')||{}).value||'',patientLast:(document.getElementById('req-last')||{}).value||'',dob:(document.getElementById('req-dob')||{}).value||'',patientPhone:(document.getElementById('req-phone')||{}).value||'',patientEmail:(document.getElementById('req-email')||{}).value||'',recordsFrom:(document.getElementById('req-from')||{}).value||'',recordsTo:(document.getElementById('req-to')||{}).value||'',caseRef:(document.getElementById('req-case')||{}).value||''};
+      if(req.patientFirst||req.patientLast){const saved=addRequest(req);if(sessionStorage.getItem('bb2_access_token')){saved.medicare.connected=true;saved.medicare.connectedAt=new Date().toISOString();saveRequests();}}
+    }
+  }
+  async function sendHipaaLink(){
+    const s=document.getElementById('hipaa-send-status');
+    const method=document.getElementById('hipaa-send-method').value;
+    // Pull patient phone + name + case ref from Step 1 fields
+    const phone=(document.getElementById('req-phone')||{}).value||'';
+    const first=(document.getElementById('req-first')||{}).value||'';
+    const last=(document.getElementById('req-last')||{}).value||'';
+    const caseRef=(document.getElementById('req-case')||{}).value||'';
+    const patientName=(first+' '+last).trim();
+    if((method==='sms'||method==='both')&&!phone){
+      s.style.color='var(--brand-danger)';
+      s.textContent='⚠ Enter patient phone number in Step 1 first.';
+      return;
+    }
+    s.style.color='var(--brand-text2)';
+    s.textContent='Sending signing link…';
+    // Generate a signing token (in production: server-side signed JWT)
+    const signingToken=Math.random().toString(36).substring(2)+Date.now().toString(36);
+    let smsSent=false,emailSent=false,errors=[];
+    // ── SMS via Twilio ──
+    if(method==='sms'||method==='both'){
+      try{
+        const res=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({toPhone:phone,patientName,caseRef,signingToken})});
+        const data=await res.json();
+        if(data.success){smsSent=true;}
+        else if(data.fallback){errors.push('SMS: Twilio not yet configured in Netlify env vars');}
+        else{errors.push('SMS: '+(data.error||'Unknown error'));}
+      }catch(err){errors.push('SMS: '+err.message);}
+    }
+    // ── Email placeholder (M365 coming soon) ──
+    if(method==='email'||method==='both'){
+      // M365 email integration pending — show placeholder success
+      emailSent=true;
+    }
+    // ── Update UI ──
+    if(errors.length&&!smsSent&&!emailSent){
+      s.style.color='var(--brand-danger)';
+      s.textContent='⚠ '+errors[0];
+    } else {
+      const parts=[];
+      if(smsSent) parts.push('SMS sent to '+phone);
+      if(emailSent&&(method==='email'||method==='both')) parts.push('email link ready');
+      s.style.color='var(--brand-success)';
+      s.textContent='✓ '+(parts.join(' · ')||'Signing link sent')+' — waiting for patient signature';
+      enableStep2Next();
+      // Show confirm banner
+      document.getElementById('hipaa-signed-confirm').style.display='flex';
+      document.getElementById('hipaa-signed-confirm').querySelector('span').textContent=
+        'Signing link sent. HIPAA form completion will unlock Step 3.';
+    }
+  }
+  function handleHipaaUpload(input){if(input.files&&input.files[0]){document.getElementById('hipaa-upload-status').innerHTML=`<span style="color:var(--brand-success);">✓ ${input.files[0].name} uploaded</span>`;document.getElementById('hipaa-signed-confirm').style.display='flex';enableStep2Next();}}
+  function enableStep2Next(){const btn=document.getElementById('step2-next');btn.style.opacity='1';btn.style.pointerEvents='auto';}
+  function generateState(){return Math.random().toString(36).substring(2)+Date.now().toString(36);}
+  function generateCodeVerifier(){const a=new Uint8Array(64);crypto.getRandomValues(a);return btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  async function generateCodeChallenge(v){const d=new TextEncoder().encode(v);const dg=await crypto.subtle.digest('SHA-256',d);return btoa(String.fromCharCode(...new Uint8Array(dg))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+  async function connectMedicare(){const state=generateState();const cv=generateCodeVerifier();const cc=await generateCodeChallenge(cv);sessionStorage.setItem('bb2_state',state);sessionStorage.setItem('bb2_code_verifier',cv);const p=new URLSearchParams({response_type:'code',client_id:BB2.clientId,redirect_uri:BB2.redirectUri,scope:BB2.scope,state,code_challenge:cc,code_challenge_method:'S256'});window.location.href=BB2.authUrl+'?'+p.toString();}
+  function checkMedicareReturn(){const connected=sessionStorage.getItem('bb2_connected');const token=sessionStorage.getItem('bb2_access_token');if(connected==='true'&&token){if(currentStep===3)goStep(4);}}
+  function fmt(d){if(!d)return 'N/A';try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return d;}}
+  function money(v){if(v===null||v===undefined)return '—';return '$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function chipColor(t){if(!t)return 'background:rgba(27,42,74,0.1);color:var(--brand-primary);font-weight:600;';if(t.includes('Part D'))return 'background:rgba(26,127,75,0.1);color:var(--brand-success);font-weight:600;';if(t.includes('Part A'))return 'background:rgba(27,42,74,0.1);color:var(--brand-primary);font-weight:600;';if(t.includes('Part B'))return 'background:rgba(27,93,170,0.1);color:#1B5DAA;font-weight:600;';return 'background:rgba(200,150,46,0.1);color:var(--brand-accent);font-weight:600;';}
+  function parseEOB(eob){const type=eob.type?.coding?.[0]?.code||eob.type?.text||'Unknown';const tm={'71':'Part A - Inpatient','72':'Part A - Outpatient','O':'Part B - Outpatient','D':'Part D - Pharmacy','pharmacy':'Part D - Pharmacy','professional':'Part B - Professional','institutional':'Part A - Institutional'};const date=eob.billablePeriod?.start||eob.item?.[0]?.servicedDate||'';const provider=eob.provider?.display||eob.careTeam?.[0]?.provider?.display||'N/A';const total=eob.total?.find(t=>t.category?.coding?.[0]?.code==='submitted')?.amount?.value||eob.payment?.amount?.value||eob.total?.[0]?.amount?.value||null;const paid=eob.payment?.amount?.value||null;const diagnoses=(eob.diagnosis||[]).slice(0,3).map(d=>d.diagnosisCodeableConcept?.coding?.[0]?.code||'').filter(Boolean);return{serviceType:tm[type]||type,date,provider,total,paid,diagnoses};}
+  function fhirFetch(body){return fetch('/api/fhir-fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());}
+  async function showMedicareData(){const token=sessionStorage.getItem('bb2_access_token');const content=document.getElementById('medicare-page-content');if(!token){content.innerHTML='<div class="card"><div class="empty-state"><div class="empty-icon">🔗</div><div class="empty-title">No Medicare data connected</div><div class="empty-sub">Connect Medicare from the Dashboard or start a New Record Request.</div><button class="btn-primary" onclick="connectMedicare()">Connect Medicare</button></div></div>';return;}content.innerHTML='<div style="text-align:center;padding:48px;"><div class="spinner"></div><div style="margin-top:16px;color:var(--brand-text2);font-size:14px;">Loading Medicare data...</div></div>';
+  try{const[patData,covData,eobData]=await Promise.all([fhirFetch({access_token:token,resource:'Patient'}),fhirFetch({access_token:token,resource:'Coverage'}),fhirFetch({access_token:token,resource:'ExplanationOfBenefit'})]);let allEntries=eobData.entry||[];let nextUrl=eobData.link?.find(l=>l.relation==='next')?.url,pages=0;while(nextUrl&&pages<2){const more=await fhirFetch({access_token:token,url:nextUrl});allEntries=allEntries.concat(more.entry||[]);nextUrl=more.link?.find(l=>l.relation==='next')?.url;pages++;}
+  const claims=allEntries.map(e=>parseEOB(e.resource));claims.sort((a,b)=>(b.date||'').localeCompare(a.date||''));const patient=patData.entry?.[0]?.resource||patData;const name=patient.name?.[0]?((patient.name[0].given?.join(' ')||'')+' '+(patient.name[0].family||'')).trim():'N/A';const covEntries=covData.entry?.map(e=>e.resource)||[];const ts={};let tb=0,tp=0;claims.forEach(c=>{if(!ts[c.serviceType])ts[c.serviceType]={count:0,billed:0,paid:0};ts[c.serviceType].count++;if(c.total){ts[c.serviceType].billed+=c.total;tb+=c.total;}if(c.paid){ts[c.serviceType].paid+=c.paid;tp+=c.paid;}});
+  const sc=Object.entries(ts).map(([t,s])=>`<div style="background:var(--brand-light);border:1px solid var(--brand-border);border-radius:10px;padding:14px 16px;flex:1;min-width:140px;"><div style="font-size:11px;${chipColor(t)}border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:8px;">${t}</div><div style="font-size:22px;font-weight:700;font-family:var(--font-mono);">${s.count}</div><div style="font-size:11px;color:var(--brand-text3);margin-top:2px;">claims</div>${s.billed>0?`<div style="font-size:12px;color:var(--brand-text2);margin-top:6px;">Billed: ${money(s.billed)}</div>`:''}${s.paid>0?`<div style="font-size:12px;color:var(--brand-success);">Paid: ${money(s.paid)}</div>`:''}</div>`).join('');
+  const cr=claims.map(c=>`<tr onmouseover="this.style.background='#F8FAFD'" onmouseout="this.style.background='transparent'"><td style="padding:10px 16px;font-size:13px;">${fmt(c.date)}</td><td style="padding:10px 16px;"><span style="font-size:11px;padding:2px 8px;border-radius:4px;${chipColor(c.serviceType)}">${c.serviceType}</span></td><td style="padding:10px 16px;font-size:13px;color:var(--brand-text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.provider}</td><td style="padding:10px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;">${money(c.total)}</td><td style="padding:10px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;color:var(--brand-success);">${money(c.paid)}</td><td style="padding:10px 16px;font-size:12px;color:var(--brand-text3);font-family:var(--font-mono);">${c.diagnoses.join(', ')||'—'}</td></tr>`).join('');
+  content.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;"><div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Patient Information <span style="font-size:11px;background:rgba(26,127,75,0.1);color:var(--brand-success);padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:600;">Live</span></div><div class="detail-row"><span class="detail-key">Name</span><span class="detail-val">${name}</span></div><div class="detail-row"><span class="detail-key">DOB</span><span class="detail-val">${patient.birthDate||'N/A'}</span></div><div class="detail-row"><span class="detail-key">Gender</span><span class="detail-val" style="text-transform:capitalize;">${patient.gender||'N/A'}</span></div><div class="detail-row"><span class="detail-key">Patient ID</span><span class="detail-val" style="font-family:var(--font-mono);font-size:11px;">${patient.id||'N/A'}</span></div></div><div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Coverage <span style="font-size:11px;background:rgba(26,127,75,0.1);color:var(--brand-success);padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:600;">Live</span></div>${covEntries.map(c=>`<div class="detail-row"><span class="detail-key">${c.type?.coding?.[0]?.display||c.type?.text||'Medicare'}</span><span class="detail-val" style="color:var(--brand-success);">${c.status}</span></div>`).join('')||'<div class="detail-row"><span class="detail-key">Plan</span><span class="detail-val" style="color:var(--brand-success);">Active</span></div>'}</div></div><div class="card" style="margin-bottom:16px;"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Claims Summary <span style="font-size:11px;background:rgba(26,127,75,0.1);color:var(--brand-success);padding:2px 8px;border-radius:4px;margin-left:6px;font-weight:600;">Live</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">${sc}</div><div style="display:flex;gap:28px;padding-top:14px;border-top:1px solid var(--brand-border);"><div><div style="font-size:12px;color:var(--brand-text2);">Claims loaded</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);">${allEntries.length} <span style="font-size:12px;color:var(--brand-text3);">of ${eobData.total??allEntries.length}</span></div></div><div><div style="font-size:12px;color:var(--brand-text2);">Total billed</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);">${money(tb)}</div></div><div><div style="font-size:12px;color:var(--brand-text2);">Total paid</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--brand-success);">${money(tp)}</div></div></div></div><div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Claims Detail <span style="font-size:12px;background:var(--brand-light);color:var(--brand-text2);padding:2px 8px;border-radius:4px;border:1px solid var(--brand-border);margin-left:6px;">${allEntries.length} records</span></div><div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Provider</th><th style="text-align:right;">Billed</th><th style="text-align:right;">Paid</th><th>Dx Codes</th></tr></thead><tbody>${cr}</tbody></table></div></div>`;
+  }catch(err){content.innerHTML=`<div class="card"><div style="color:var(--brand-danger);font-weight:600;margin-bottom:8px;">Error loading Medicare data</div><div style="font-size:13px;color:var(--brand-text2);">${err.message}</div></div>`;}}
+  let reportCache=null;
+  async function generateReport(){const token=sessionStorage.getItem('bb2_access_token');if(!token){document.getElementById('rpt-status').textContent='Connect Medicare first.';return;}const patientName=document.getElementById('rpt-patient-name').value.trim()||'Patient';const dateFrom=document.getElementById('rpt-date-from').value;const dateTo=document.getElementById('rpt-date-to').value;if(!dateFrom||!dateTo){document.getElementById('rpt-status').textContent='Please select a date range.';return;}const status=document.getElementById('rpt-status');status.textContent='Pulling claims...';document.getElementById('report-output').style.display='none';
+  try{const[patData,covData,eobData]=await Promise.all([fhirFetch({access_token:token,resource:'Patient'}),fhirFetch({access_token:token,resource:'Coverage'}),fhirFetch({access_token:token,resource:'ExplanationOfBenefit'})]);let allEntries=eobData.entry||[];let nextUrl=eobData.link?.find(l=>l.relation==='next')?.url,pages=0;while(nextUrl&&pages<2){const more=await fhirFetch({access_token:token,url:nextUrl});allEntries=allEntries.concat(more.entry||[]);nextUrl=more.link?.find(l=>l.relation==='next')?.url;pages++;}
+  const from=new Date(dateFrom),to=new Date(dateTo);const allClaims=allEntries.map(e=>parseEOB(e.resource));const filtered=allClaims.filter(c=>{if(!c.date)return true;const d=new Date(c.date);return d>=from&&d<=to;});filtered.sort((a,b)=>(b.date||'').localeCompare(a.date||''));const patient=patData.entry?.[0]?.resource||patData;const name=patient.name?.[0]?((patient.name[0].given?.join(' ')||'')+' '+(patient.name[0].family||'')).trim():patientName;const covEntries=covData.entry?.map(e=>e.resource)||[];const coverage=covEntries.map(c=>({part:c.type?.coding?.[0]?.display||c.type?.text||'Medicare',status:c.status||'active'}));
+  status.textContent='Generating AI summary...';const summaryRes=await fetch('/api/generate-summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient:{name:name||patientName,dob:patient.birthDate||'N/A',gender:patient.gender||'N/A'},coverage,claims:filtered.slice(0,100),dateFrom,dateTo})});const summary=await summaryRes.json();
+  reportCache={summary,claims:filtered,patient:{name:name||patientName,dob:patient.birthDate,gender:patient.gender},dateFrom,dateTo,coverage};
+  document.getElementById('rpt-header-sub').textContent=(name||patientName)+' · '+dateFrom+' – '+dateTo;document.getElementById('rpt-overview').textContent=summary.overview||'—';const hl=document.getElementById('rpt-highlights');hl.innerHTML=(summary.careHighlights||[]).map(h=>`<li style="padding:3px 0;display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--brand-secondary);font-weight:700;flex-shrink:0;">›</span>${h}</li>`).join('')||'<li>—</li>';document.getElementById('rpt-providers').textContent=summary.providersAndServices||'—';document.getElementById('rpt-cost').textContent=summary.costSummary||'—';document.getElementById('rpt-diagnoses').textContent=summary.diagnoses||'—';document.getElementById('rpt-recommendations').textContent=summary.recommendations||'—';
+  document.getElementById('rpt-claim-count').textContent=filtered.length+' claims';const tbody=document.getElementById('rpt-claims-tbody');tbody.innerHTML=filtered.map(c=>`<tr onmouseover="this.style.background='#F8FAFD'" onmouseout="this.style.background='transparent'"><td style="padding:9px 16px;font-size:13px;">${fmt(c.date)}</td><td style="padding:9px 16px;"><span style="font-size:11px;padding:2px 8px;border-radius:4px;${chipColor(c.serviceType)}">${c.serviceType}</span></td><td style="padding:9px 16px;font-size:13px;color:var(--brand-text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.provider}</td><td style="padding:9px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;">${money(c.total)}</td><td style="padding:9px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;color:var(--brand-success);">${money(c.paid)}</td><td style="padding:9px 16px;font-size:12px;color:var(--brand-text3);font-family:var(--font-mono);">${c.diagnoses.join(', ')||'—'}</td></tr>`).join('');
+  document.getElementById('report-output').style.display='block';status.textContent='';}catch(err){status.textContent='Error: '+err.message;}}
+  async function exportPDF(){if(!reportCache)return;const{summary,claims,patient,dateFrom,dateTo}=reportCache;if(!window.jspdf){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'letter'});const W=215.9,M=20;let y=20;
+  function txt(t,size,weight,color){doc.setFontSize(size||11);doc.setFont('helvetica',weight||'normal');doc.setTextColor(...(color||[30,30,30]));const lines=doc.splitTextToSize(t,W-M*2);doc.text(lines,M,y);y+=(lines.length*(size||11)*0.45)+2;}
+  function sect(t){y+=4;doc.setFillColor(244,246,250);doc.rect(M,y-5,W-M*2,8,'F');txt(t,9,'bold',[27,42,74]);y+=2;}
+  function chk(){if(y>258){doc.addPage();y=20;}}
+  doc.setFillColor(27,42,74);doc.rect(0,0,W,30,'F');doc.setFillColor(196,30,58);doc.rect(0,28,W,3,'F');doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text('Rapid Records',M,14);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,210,230);doc.text('Medical Record Report  |  Powered by CMS Blue Button 2.0',M,22);doc.setFontSize(9);doc.text(`Generated: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`,W-M-65,22);y=42;
+  // Add logo to PDF
+try{
+  const logoImg = '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';
+  doc.addImage('data:image/png;base64,'+logoImg,'PNG',M,y,50,20);
+  y+=26;
+}catch(e){
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(27,42,74);doc.text(TENANT.firmName,M,y);y+=7;
+}doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);doc.text(patient.name,M,y);y+=6;doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(90,104,128);doc.text(`DOB: ${patient.dob||'N/A'}   |   Gender: ${patient.gender||'N/A'}   |   Period: ${dateFrom} – ${dateTo}`,M,y);y+=5;doc.setDrawColor(196,30,58);doc.setLineWidth(0.5);doc.line(M,y,W-M,y);y+=8;
+  sect('EXECUTIVE SUMMARY');txt(summary.overview||'—',10);chk();if(summary.careHighlights?.length){sect('CARE HIGHLIGHTS');summary.careHighlights.forEach(h=>{chk();txt('› '+h,10);});}chk();sect('PROVIDERS & SERVICES');txt(summary.providersAndServices||'—',10);chk();sect('COST SUMMARY');txt(summary.costSummary||'—',10);chk();sect('DIAGNOSES');txt(summary.diagnoses||'—',10);chk();if(summary.recommendations){sect('ADMINISTRATOR NOTES');txt(summary.recommendations,10);}
+  doc.addPage();y=20;doc.setFillColor(27,42,74);doc.rect(0,0,W,12,'F');doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text(`Claims Detail — ${claims.length} records`,M,8);y=22;
+  const cW=[28,42,50,24,24,28];const heads=['Date','Type','Provider','Billed','Paid','Dx'];doc.setFillColor(244,246,250);doc.rect(M,y-5,W-M*2,8,'F');doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(90,104,128);let cx=M;heads.forEach((h,i)=>{doc.text(h,cx,y);cx+=cW[i];});y+=4;doc.setDrawColor(196,30,58);doc.setLineWidth(0.3);doc.line(M,y,W-M,y);y+=4;doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+  claims.forEach(c=>{chk();doc.setTextColor(40,40,40);cx=M;[fmt(c.date),(c.serviceType||'').substring(0,20),(c.provider||'').substring(0,24),money(c.total),money(c.paid),c.diagnoses.join(',').substring(0,16)||'—'].forEach((v,i)=>{doc.text(String(v),cx,y);cx+=cW[i];});y+=5;doc.setDrawColor(220,226,236);doc.setLineWidth(0.2);doc.line(M,y-1,W-M,y-1);});
+  const pages=doc.internal.getNumberOfPages();for(let i=1;i<=pages;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160,160,160);doc.text(`${TENANT.firmName}  |  Rapid Records  |  Page ${i} of ${pages}`,M,273);}
+  doc.save(`RapidRecords_${(patient.name||'Patient').replace(/\s+/g,'_')}_${dateFrom}_to_${dateTo}.pdf`);}
+  function exportInvoice(){alert('Invoice export coming soon.');}
+  function showEmailModal(){if(!reportCache)return;document.getElementById('email-modal').classList.add('open');document.getElementById('email-send-status').textContent='';}
+  function closeEmailModal(){document.getElementById('email-modal').classList.remove('open');}
+  async function sendReportEmail(){if(!reportCache)return;const toEmail=document.getElementById('send-email-addr').value.trim();if(!toEmail){document.getElementById('email-send-status').textContent='Please enter an email.';return;}const s=document.getElementById('email-send-status');s.style.color='var(--brand-text2)';s.textContent='Sending...';try{const res=await fetch('/api/send-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({toEmail,patientName:reportCache.patient.name,dateFrom:reportCache.dateFrom,dateTo:reportCache.dateTo,reportData:{summary:reportCache.summary}})});const data=await res.json();if(data.fallback){s.style.color='var(--brand-warn)';s.textContent='M365 not yet configured — use Download PDF.';}else if(data.success){s.style.color='var(--brand-success)';s.textContent='Sent! Link expires in 48 hours.';setTimeout(closeEmailModal,2000);}else{s.style.color='var(--brand-danger)';s.textContent='Send failed: '+(data.error||'Unknown error');}}catch(err){s.style.color='var(--brand-danger)';s.textContent='Error: '+err.message;}}
+
+  // Auto-login if returning from Medicare OAuth or already authenticated
+
+  // ── REQUESTS STORE ────────────────────────────────────────────────────────
+  let requestsStore = JSON.parse(sessionStorage.getItem('rr_requests') || '[]');
+  let currentCase   = null;
+
+  function saveRequests() {
+    sessionStorage.setItem('rr_requests', JSON.stringify(requestsStore));
+  }
+
+  function addRequest(req) {
+    req.id        = Date.now().toString(36) + Math.random().toString(36).substring(2,6);
+    req.submitted = new Date().toISOString();
+    req.status    = 'In Progress';
+    req.hipaa     = { sent: false, signed: false, method: '', signedAt: '' };
+    req.medicare  = { connected: false };
+    req.report    = { generated: false };
+    requestsStore.unshift(req);
+    saveRequests();
+    renderRequestsTable();
+    return req;
+  }
+
+  function renderRequestsTable() {
+    const tbody   = document.getElementById('requests-tbody');
+    const empty   = document.getElementById('requests-empty-state');
+    const tableWrap = document.getElementById('requests-table-container');
+    if (!requestsStore.length) {
+      empty.style.display = 'block'; tableWrap.style.display = 'none'; return;
+    }
+    empty.style.display = 'none'; tableWrap.style.display = 'block';
+    const reportsReady = requestsStore.filter(r => r.report.generated).length;
+    const badge = document.getElementById('reports-ready-badge');
+    if (reportsReady > 0) { badge.style.display = 'inline-block'; badge.textContent = reportsReady; }
+    else { badge.style.display = 'none'; }
+    tbody.innerHTML = requestsStore.map(r => {
+      const hipaaChip    = r.hipaa.signed   ? '<span class="chip chip-signed">Signed</span>'   : r.hipaa.sent ? '<span class="chip chip-pending">Sent</span>' : '<span class="chip chip-unsigned">Pending</span>';
+      const medicareChip = r.medicare.connected ? '<span class="chip chip-complete">Connected</span>' : '<span class="chip chip-pending">Pending</span>';
+      const reportChip   = r.report.generated   ? '<span class="chip chip-complete">Ready ✓</span>'   : '<span class="chip chip-unsigned">Not yet</span>';
+      const statusChip   = `<span class="chip chip-${r.status === 'Complete' ? 'complete' : r.status === 'In Progress' ? 'progress' : 'pending'}">${r.status}</span>`;
+      const d = new Date(r.submitted).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      return `<tr onclick="openCase('${r.id}')">
+        <td style="font-weight:600;">${r.patientFirst} ${r.patientLast}</td>
+        <td style="color:var(--brand-text2);font-size:13px;">${r.caseRef||'—'}</td>
+        <td style="font-size:13px;">${d}</td>
+        <td>${hipaaChip}</td>
+        <td>${medicareChip}</td>
+        <td>${reportChip}</td>
+        <td>${statusChip}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function openCase(id) {
+    currentCase = requestsStore.find(r => r.id === id);
+    if (!currentCase) return;
+    // Populate meta
+    document.getElementById('case-detail-name').textContent = `${currentCase.patientFirst} ${currentCase.patientLast}`;
+    document.getElementById('cd-patient').textContent   = `${currentCase.patientFirst} ${currentCase.patientLast}`;
+    document.getElementById('cd-caseref').textContent   = currentCase.caseRef || '—';
+    document.getElementById('cd-dob').textContent       = currentCase.dob || '—';
+    document.getElementById('cd-period').textContent    = currentCase.recordsFrom && currentCase.recordsTo ? `${currentCase.recordsFrom} – ${currentCase.recordsTo}` : '—';
+    const d = new Date(currentCase.submitted).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('cd-submitted').textContent = d;
+    // Status chip
+    const chip = document.getElementById('case-detail-status-chip');
+    chip.textContent = currentCase.status;
+    chip.className = `chip chip-${currentCase.status === 'Complete' ? 'complete' : currentCase.status === 'In Progress' ? 'progress' : 'pending'}`;
+    // Timeline
+    buildTimeline();
+    // HIPAA tab
+    document.getElementById('cd-hipaa-sent').textContent      = currentCase.hipaa.sent ? 'Yes' : 'No';
+    document.getElementById('cd-hipaa-signed').textContent    = currentCase.hipaa.signed ? 'Yes ✓' : 'Awaiting patient';
+    document.getElementById('cd-hipaa-signed-at').textContent = currentCase.hipaa.signedAt || '—';
+    document.getElementById('cd-hipaa-method').textContent    = currentCase.hipaa.method || '—';
+    // Prefill report dates
+    if (currentCase.recordsFrom) document.getElementById('cd-rpt-from').value = currentCase.recordsFrom;
+    if (currentCase.recordsTo)   document.getElementById('cd-rpt-to').value   = currentCase.recordsTo;
+    // Medicare stats if available
+    if (currentCase.medicare.connected && currentCase.medicare.stats) {
+      const s = currentCase.medicare.stats;
+      document.getElementById('cd-claim-count').textContent  = s.claimCount || '—';
+      document.getElementById('cd-total-billed').textContent = s.totalBilled ? ('$'+Number(s.totalBilled).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})) : '—';
+      document.getElementById('cd-total-paid').textContent   = s.totalPaid   ? ('$'+Number(s.totalPaid).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))   : '—';
+    }
+    // Show detail, hide list
+    document.getElementById('requests-list-view').style.display = 'none';
+    document.getElementById('case-detail-view').style.display   = 'block';
+    switchTab('overview');
+    // Load Medicare data if connected
+    if (currentCase.medicare.connected) loadCaseMedicare();
+  }
+
+  function closeCaseDetail() {
+    document.getElementById('case-detail-view').style.display   = 'none';
+    document.getElementById('requests-list-view').style.display = 'block';
+    currentCase = null;
+  }
+
+  function buildTimeline() {
+    const events = [];
+    events.push({ label: 'Request submitted', date: currentCase.submitted, done: true });
+    events.push({ label: 'HIPAA link sent',   date: currentCase.hipaa.sentAt || '', done: currentCase.hipaa.sent });
+    events.push({ label: 'HIPAA signed',      date: currentCase.hipaa.signedAt || '', done: currentCase.hipaa.signed });
+    events.push({ label: 'Medicare connected', date: currentCase.medicare.connectedAt || '', done: currentCase.medicare.connected });
+    events.push({ label: 'AI report ready',   date: currentCase.report.generatedAt || '', done: currentCase.report.generated });
+    document.getElementById('cd-timeline').innerHTML = events.map(e => {
+      const dot   = e.done ? 'background:var(--brand-success);' : 'background:var(--brand-border2);';
+      const label = `<span style="font-size:13px;font-weight:${e.done?'600':'400'};color:${e.done?'var(--brand-text1)':'var(--brand-text3)'};">${e.label}</span>`;
+      const date  = e.date ? `<span style="font-size:11px;color:var(--brand-text3);margin-left:auto;">${new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>` : '';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--brand-border);"><div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;${dot}"></div>${label}${date}</div>`;
+    }).join('');
+  }
+
+  function switchTab(tab) {
+    ['overview','medicare','report','hipaa'].forEach(t => {
+      const btn     = document.getElementById('tab-'+t);
+      const content = document.getElementById('tab-content-'+t);
+      if (t === tab) {
+        btn.style.borderBottomColor = 'var(--brand-primary)';
+        btn.style.color = 'var(--brand-primary)';
+        content.style.display = 'block';
+      } else {
+        btn.style.borderBottomColor = 'transparent';
+        btn.style.color = 'var(--brand-text2)';
+        content.style.display = 'none';
+      }
+    });
+    if (tab === 'medicare' && currentCase && currentCase.medicare.connected) loadCaseMedicare();
+  }
+
+  async function loadCaseMedicare() {
+    const token   = sessionStorage.getItem('bb2_access_token');
+    const content = document.getElementById('case-medicare-content');
+    if (!token) { content.innerHTML = '<div style="text-align:center;padding:32px;color:var(--brand-text2);">Connect Medicare first via Identity Verification step.</div>'; return; }
+    content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div><div style="margin-top:14px;color:var(--brand-text2);font-size:14px;">Loading Medicare data...</div></div>';
+    try {
+      const [patData,covData,eobData] = await Promise.all([fhirFetch({access_token:token,resource:'Patient'}),fhirFetch({access_token:token,resource:'Coverage'}),fhirFetch({access_token:token,resource:'ExplanationOfBenefit'})]);
+      let allEntries = eobData.entry||[];
+      let nextUrl = eobData.link?.find(l=>l.relation==='next')?.url, pages=0;
+      while(nextUrl&&pages<2){const more=await fhirFetch({access_token:token,url:nextUrl});allEntries=allEntries.concat(more.entry||[]);nextUrl=more.link?.find(l=>l.relation==='next')?.url;pages++;}
+      const claims = allEntries.map(e=>parseEOB(e.resource));
+      claims.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      const patient = patData.entry?.[0]?.resource||patData;
+      const name = patient.name?.[0]?((patient.name[0].given?.join(' ')||'')+' '+(patient.name[0].family||'')).trim():'N/A';
+      const covEntries = covData.entry?.map(e=>e.resource)||[];
+      const ts={};let tb=0,tp=0;
+      claims.forEach(c=>{if(!ts[c.serviceType])ts[c.serviceType]={count:0,billed:0,paid:0};ts[c.serviceType].count++;if(c.total){ts[c.serviceType].billed+=c.total;tb+=c.total;}if(c.paid){ts[c.serviceType].paid+=c.paid;tp+=c.paid;}});
+      // Update case stats
+      if (currentCase) {
+        currentCase.medicare.stats = { claimCount: allEntries.length, totalBilled: tb, totalPaid: tp };
+        document.getElementById('cd-claim-count').textContent  = allEntries.length;
+        document.getElementById('cd-total-billed').textContent = '$'+tb.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        document.getElementById('cd-total-paid').textContent   = '$'+tp.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        saveRequests();
+      }
+      const sc = Object.entries(ts).map(([t,s])=>`<div style="background:var(--brand-light);border:1px solid var(--brand-border);border-radius:10px;padding:14px 16px;flex:1;min-width:120px;"><div style="font-size:11px;${chipColor(t)}border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:8px;">${t}</div><div style="font-size:20px;font-weight:700;font-family:var(--font-mono);">${s.count}</div><div style="font-size:11px;color:var(--brand-text3);">claims</div>${s.billed>0?`<div style="font-size:12px;color:var(--brand-text2);margin-top:4px;">Billed: ${money(s.billed)}</div>`:''}</div>`).join('');
+      const cr = claims.map(c=>`<tr onmouseover="this.style.background='#F8FAFD'" onmouseout="this.style.background='transparent'"><td style="padding:9px 16px;font-size:13px;">${fmt(c.date)}</td><td style="padding:9px 16px;"><span style="font-size:11px;padding:2px 8px;border-radius:4px;${chipColor(c.serviceType)}">${c.serviceType}</span></td><td style="padding:9px 16px;font-size:13px;color:var(--brand-text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.provider}</td><td style="padding:9px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;">${money(c.total)}</td><td style="padding:9px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;color:var(--brand-success);">${money(c.paid)}</td><td style="padding:9px 16px;font-size:12px;color:var(--brand-text3);font-family:var(--font-mono);">${c.diagnoses.join(', ')||'—'}</td></tr>`).join('');
+      content.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Patient <span style="font-size:11px;background:rgba(26,127,75,0.1);color:var(--brand-success);padding:2px 8px;border-radius:4px;margin-left:6px;">Live</span></div>
+            <div class="detail-row"><span class="detail-key">Name</span><span class="detail-val">${name}</span></div>
+            <div class="detail-row"><span class="detail-key">DOB</span><span class="detail-val">${patient.birthDate||'N/A'}</span></div>
+            <div class="detail-row"><span class="detail-key">Gender</span><span class="detail-val" style="text-transform:capitalize;">${patient.gender||'N/A'}</span></div>
+          </div>
+          <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Coverage <span style="font-size:11px;background:rgba(26,127,75,0.1);color:var(--brand-success);padding:2px 8px;border-radius:4px;margin-left:6px;">Live</span></div>
+            ${covEntries.map(c=>`<div class="detail-row"><span class="detail-key">${c.type?.coding?.[0]?.display||'Medicare'}</span><span class="detail-val" style="color:var(--brand-success);">${c.status}</span></div>`).join('')||'<div class="detail-row"><span class="detail-key">Plan</span><span class="detail-val" style="color:var(--brand-success);">Active</span></div>'}
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Claims Summary</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">${sc}</div>
+          <div style="display:flex;gap:24px;padding-top:14px;border-top:1px solid var(--brand-border);">
+            <div><div style="font-size:12px;color:var(--brand-text2);">Claims loaded</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);">${allEntries.length}</div></div>
+            <div><div style="font-size:12px;color:var(--brand-text2);">Total billed</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);">${money(tb)}</div></div>
+            <div><div style="font-size:12px;color:var(--brand-text2);">Total paid</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--brand-success);">${money(tp)}</div></div>
+          </div>
+        </div>
+        <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;">Claims Detail <span style="font-size:12px;background:var(--brand-light);color:var(--brand-text2);padding:2px 8px;border-radius:4px;border:1px solid var(--brand-border);margin-left:6px;">${allEntries.length} records</span></div>
+          <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Date</th><th>Type</th><th>Provider</th><th style="text-align:right;">Billed</th><th style="text-align:right;">Paid</th><th>Dx Codes</th></tr></thead><tbody>${cr}</tbody></table></div>
+        </div>`;
+    } catch(err) { content.innerHTML = `<div class="card" style="color:var(--brand-danger);">${err.message}</div>`; }
+  }
+
+  async function loadCaseReport() {
+    if (!currentCase) return;
+    const token = sessionStorage.getItem('bb2_access_token');
+    if (!token) { document.getElementById('cd-rpt-status').textContent = 'Connect Medicare first.'; return; }
+    const dateFrom = document.getElementById('cd-rpt-from').value;
+    const dateTo   = document.getElementById('cd-rpt-to').value;
+    if (!dateFrom||!dateTo) { document.getElementById('cd-rpt-status').textContent = 'Please select a date range.'; return; }
+    const status = document.getElementById('cd-rpt-status');
+    status.textContent = 'Pulling claims...';
+    document.getElementById('case-report-output').style.display = 'none';
+    try {
+      const [patData,covData,eobData] = await Promise.all([fhirFetch({access_token:token,resource:'Patient'}),fhirFetch({access_token:token,resource:'Coverage'}),fhirFetch({access_token:token,resource:'ExplanationOfBenefit'})]);
+      let allEntries=eobData.entry||[];let nextUrl=eobData.link?.find(l=>l.relation==='next')?.url,pages=0;
+      while(nextUrl&&pages<2){const more=await fhirFetch({access_token:token,url:nextUrl});allEntries=allEntries.concat(more.entry||[]);nextUrl=more.link?.find(l=>l.relation==='next')?.url;pages++;}
+      const from=new Date(dateFrom),to=new Date(dateTo);
+      const allClaims=allEntries.map(e=>parseEOB(e.resource));
+      const filtered=allClaims.filter(c=>{if(!c.date)return true;const d=new Date(c.date);return d>=from&&d<=to;});
+      filtered.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+      const patient=patData.entry?.[0]?.resource||patData;
+      const name=patient.name?.[0]?((patient.name[0].given?.join(' ')||'')+' '+(patient.name[0].family||'')).trim():`${currentCase.patientFirst} ${currentCase.patientLast}`;
+      const covEntries=covData.entry?.map(e=>e.resource)||[];
+      const coverage=covEntries.map(c=>({part:c.type?.coding?.[0]?.display||'Medicare',status:c.status||'active'}));
+      status.textContent='Generating AI summary...';
+      const summaryRes=await fetch('/api/generate-summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient:{name,dob:patient.birthDate||'N/A',gender:patient.gender||'N/A'},coverage,claims:filtered.slice(0,100),dateFrom,dateTo})});
+      const summary=await summaryRes.json();
+      reportCache={summary,claims:filtered,patient:{name,dob:patient.birthDate,gender:patient.gender},dateFrom,dateTo,coverage};
+      // Update case record
+      currentCase.report.generated   = true;
+      currentCase.report.generatedAt = new Date().toISOString();
+      currentCase.report.summary     = summary;
+      currentCase.status = 'Complete';
+      saveRequests();
+      renderRequestsTable();
+      // Render
+      document.getElementById('cd-rpt-header-sub').textContent = name+' · '+dateFrom+' – '+dateTo;
+      document.getElementById('cd-rpt-overview').textContent   = summary.overview||'—';
+      const hl=document.getElementById('cd-rpt-highlights');
+      hl.innerHTML=(summary.careHighlights||[]).map(h=>`<li style="padding:3px 0;display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--brand-secondary);font-weight:700;flex-shrink:0;">›</span>${h}</li>`).join('')||'<li>—</li>';
+      document.getElementById('cd-rpt-cost').textContent            = summary.costSummary||'—';
+      document.getElementById('cd-rpt-recommendations').textContent = summary.recommendations||'—';
+      document.getElementById('cd-rpt-claim-count').textContent     = filtered.length+' claims';
+      const tbody=document.getElementById('cd-rpt-claims-tbody');
+      tbody.innerHTML=filtered.map(c=>`<tr onmouseover="this.style.background='#F8FAFD'" onmouseout="this.style.background='transparent'"><td style="padding:9px 16px;font-size:13px;">${fmt(c.date)}</td><td style="padding:9px 16px;"><span style="font-size:11px;padding:2px 8px;border-radius:4px;${chipColor(c.serviceType)}">${c.serviceType}</span></td><td style="padding:9px 16px;font-size:13px;color:var(--brand-text2);">${c.provider}</td><td style="padding:9px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;">${money(c.total)}</td><td style="padding:9px 16px;font-size:13px;font-family:var(--font-mono);text-align:right;color:var(--brand-success);">${money(c.paid)}</td><td style="padding:9px 16px;font-size:12px;color:var(--brand-text3);font-family:var(--font-mono);">${c.diagnoses.join(', ')||'—'}</td></tr>`).join('');
+      document.getElementById('case-report-output').style.display='block';
+      status.textContent='';
+    } catch(err){status.textContent='Error: '+err.message;}
+  }
+
+  function exportCasePDF(){ exportPDF(); }
+
+  function resendHipaaLink() {
+    if (!currentCase) return;
+    alert('Resend HIPAA link to ' + (currentCase.patientPhone||'patient') + ' — Twilio function will fire.');
+  }
+
+  // Render on load
+  renderRequestsTable();
+
+  (function(){
+    const params = new URLSearchParams(window.location.search);
+    const autologin = params.get('autologin') === '1';
+    if(autologin || sessionStorage.getItem('portal_authed')==='true'){
+      doLogin();
+      if(autologin) window.history.replaceState({},'','/');
+    }
+  })();
+</script>
+</body>
+</html>
