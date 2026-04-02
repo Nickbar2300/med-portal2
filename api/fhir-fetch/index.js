@@ -1,3 +1,4 @@
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 module.exports = async function (context, req) {
   context.res = { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } };
 
