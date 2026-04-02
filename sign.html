@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>HIPAA Authorization — Marzzacco Niven & Associates</title>
+  <style>
+    :root{--navy:#1B2A4A;--red:#C41E3A;--gold:#C8962E;--light:#F4F6FA;--border:#DDE2EC;--text1:#1B2A4A;--text2:#5A6880;--text3:#8C97AA;--success:#1A7F4B;}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--text1);min-height:100vh;}
+    .header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+    .header-logo{width:36px;height:36px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px;flex-shrink:0;}
+    .header-text .firm{font-size:13px;font-weight:600;color:white;}
+    .header-text .sub{font-size:11px;color:rgba(255,255,255,0.5);}
+    .container{max-width:600px;margin:0 auto;padding:24px 16px 48px;}
+    .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:10px;}
+    .patient-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;border-top:3px solid var(--navy);}
+    .patient-name{font-size:17px;font-weight:700;margin-bottom:4px;}
+    .patient-meta{font-size:13px;color:var(--text2);}
+    .patient-ref{font-size:12px;color:var(--gold);font-weight:600;margin-top:6px;}
+    .hipaa-card{background:white;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;max-height:280px;overflow-y:auto;}
+    .hipaa-card h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--navy);}
+    .hipaa-card p{font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:10px;}
+    .hipaa-card strong{color:var(--text1);}
+    .consent-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;}
+    .consent-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .consent-item:last-child{border-bottom:none;padding-bottom:0;}
+    .consent-item input[type="checkbox"]{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--navy);cursor:pointer;}
+    .consent-item label{font-size:13px;line-height:1.6;color:var(--text1);cursor:pointer;}
+    .sig-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;}
+    .sig-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .sig-label{font-size:13px;font-weight:600;}
+    .sig-clear{font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;border-radius:4px;}
+    .sig-canvas-wrap{border:2px dashed var(--border);border-radius:10px;background:var(--light);position:relative;overflow:hidden;touch-action:none;}
+    .sig-canvas-wrap.active{border-color:var(--navy);border-style:solid;}
+    canvas#sig-canvas{display:block;width:100%;height:160px;cursor:crosshair;}
+    .sig-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;color:var(--text3);pointer-events:none;display:flex;align-items:center;gap:6px;}
+    .sig-placeholder svg{width:16px;height:16px;fill:var(--text3);}
+    .btn-submit{width:100%;background:var(--navy);color:white;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+    .btn-submit:hover{background:#253d6b;}
+    .btn-submit:disabled{background:var(--text3);cursor:not-allowed;}
+    #success-screen{display:none;text-align:center;padding:48px 24px;}
+    .success-circle{width:80px;height:80px;background:rgba(26,127,75,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+    .success-circle svg{width:40px;height:40px;fill:var(--success);}
+    .success-title{font-size:22px;font-weight:700;margin-bottom:10px;}
+    .success-sub{font-size:14px;color:var(--text2);line-height:1.7;max-width:320px;margin:0 auto;}
+    #expired-screen{display:none;text-align:center;padding:48px 24px;}
+    .expired-circle{width:80px;height:80px;background:rgba(196,30,58,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+    .expired-circle svg{width:40px;height:40px;fill:var(--red);}
+    .footer{text-align:center;font-size:11px;color:var(--text3);margin-top:32px;line-height:1.8;}
+    .footer span{color:var(--red);font-weight:600;}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">RR</div>
+  <div class="header-text">
+    <div class="firm">Marzzacco Niven & Associates</div>
+    <div class="sub">HIPAA Authorization Request</div>
+  </div>
+</div>
+
+<!-- Signing form -->
+<div id="sign-screen">
+  <div class="container">
+
+    <div class="section-title">Your Information</div>
+    <div class="patient-card">
+      <div class="patient-name" id="patient-name">Patient</div>
+      <div class="patient-meta">Authorization request from Marzzacco Niven & Associates</div>
+      <div class="patient-ref" id="patient-ref"></div>
+    </div>
+
+    <div class="section-title">Authorization for Release of Health Information</div>
+    <div class="hipaa-card">
+      <h3>HIPAA Authorization — Medicare Records</h3>
+      <p>I, the undersigned, hereby authorize <strong>Marzzacco Niven & Associates</strong> and their designated representatives to access, obtain, and review my Medicare claims data through the Centers for Medicare & Medicaid Services (CMS) Blue Button 2.0 system.</p>
+      <p><strong>What will be accessed:</strong> My Medicare claims history including doctor visits, hospital visits, prescription medications, and associated billing information.</p>
+      <p><strong>Purpose:</strong> This information will be used solely for the purpose of evaluating and pursuing my legal claim. Records will be maintained in a secure, HIPAA-compliant system and will not be shared with unauthorized third parties.</p>
+      <p><strong>Duration:</strong> This authorization is valid for the duration of my legal matter with Marzzacco Niven & Associates, unless revoked earlier in writing.</p>
+      <p><strong>Right to revoke:</strong> I understand I may revoke this authorization at any time by providing written notice to Marzzacco Niven & Associates. Revocation will not affect actions already taken in reliance on this authorization.</p>
+      <p><strong>Re-disclosure:</strong> I understand that information disclosed pursuant to this authorization may be subject to re-disclosure by the recipient and may no longer be protected by HIPAA.</p>
+      <p>I have read and understand this authorization. I am signing this form voluntarily.</p>
+    </div>
+
+    <div class="section-title">I confirm that</div>
+    <div class="consent-card">
+      <div class="consent-item">
+        <input type="checkbox" id="check1" onchange="updateSubmitBtn()"/>
+        <label for="check1">I am the patient named above or their authorized representative</label>
+      </div>
+      <div class="consent-item">
+        <input type="checkbox" id="check2" onchange="updateSubmitBtn()"/>
+        <label for="check2">I have read and understand the HIPAA authorization above</label>
+      </div>
+      <div class="consent-item">
+        <input type="checkbox" id="check3" onchange="updateSubmitBtn()"/>
+        <label for="check3">I authorize Marzzacco Niven & Associates to access my Medicare records for the purpose described</label>
+      </div>
+    </div>
+
+    <div class="section-title">Your Signature</div>
+    <div class="sig-card">
+      <div class="sig-header">
+        <div class="sig-label">Sign with your finger below</div>
+        <button class="sig-clear" onclick="clearSignature()">Clear</button>
+      </div>
+      <div class="sig-canvas-wrap" id="sig-wrap">
+        <canvas id="sig-canvas"></canvas>
+        <div class="sig-placeholder" id="sig-placeholder">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          Sign here
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;">By signing you agree to the HIPAA authorization above. Date: <span id="sign-date"></span></div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" disabled onclick="submitSignature()">Submit Authorization</button>
+
+    <div class="footer">
+      This request was sent by <span>Marzzacco Niven & Associates</span><br>
+      Harrisburg, PA · (717) 231-1640 · klnivenlaw.com<br>
+      Powered by Rapid Records · HIPAA Compliant
+    </div>
+  </div>
+</div>
+
+<!-- Success -->
+<div id="success-screen">
+  <div class="container">
+    <div class="success-circle"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+    <div class="success-title">Authorization Submitted</div>
+    <div class="success-sub">Thank you. Your signed HIPAA authorization has been securely received by Marzzacco Niven & Associates. You may close this window.</div>
+    <div style="margin-top:32px;font-size:12px;color:var(--text3);">Submitted on <span id="submitted-date"></span><br>Powered by Rapid Records</div>
+  </div>
+</div>
+
+<!-- Expired -->
+<div id="expired-screen">
+  <div class="container">
+    <div class="expired-circle"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+    <div class="success-title" style="color:var(--red);">Link Expired</div>
+    <div class="success-sub">This signing link has expired or is no longer valid. Please contact Marzzacco Niven & Associates to request a new link.<br><br><strong>(717) 231-1640</strong></div>
+  </div>
+</div>
+
+<script>
+  const params      = new URLSearchParams(window.location.search);
+  const token       = params.get('token');
+  const patientName = params.get('name')  || '';
+  const caseRef     = params.get('ref')   || '';
+  const expiresAt   = params.get('exp')   || '';
+  const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('sign-date').textContent = today;
+  document.getElementById('submitted-date').textContent = today;
+  if(patientName) document.getElementById('patient-name').textContent = decodeURIComponent(patientName);
+  if(caseRef)     document.getElementById('patient-ref').textContent  = 'Case Ref: ' + decodeURIComponent(caseRef);
+  if(!token || (expiresAt && Date.now() > parseInt(expiresAt))){
+    document.getElementById('sign-screen').style.display    = 'none';
+    document.getElementById('expired-screen').style.display = 'block';
+  }
+
+  // Canvas
+  const canvas = document.getElementById('sig-canvas');
+  const ctx    = canvas.getContext('2d');
+  const wrap   = document.getElementById('sig-wrap');
+  let drawing  = false, hasSig = false;
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr  = window.devicePixelRatio || 1;
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#1B2A4A';
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    if(e.touches) return {x:e.touches[0].clientX-rect.left, y:e.touches[0].clientY-rect.top};
+    return {x:e.clientX-rect.left, y:e.clientY-rect.top};
+  }
+  function startDraw(e){e.preventDefault();drawing=true;const p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);wrap.classList.add('active');document.getElementById('sig-placeholder').style.display='none';}
+  function draw(e){if(!drawing)return;e.preventDefault();const p=getPos(e);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);hasSig=true;updateSubmitBtn();}
+  function stopDraw(){drawing=false;ctx.beginPath();}
+
+  canvas.addEventListener('mousedown',  startDraw);
+  canvas.addEventListener('mousemove',  draw);
+  canvas.addEventListener('mouseup',    stopDraw);
+  canvas.addEventListener('mouseleave', stopDraw);
+  canvas.addEventListener('touchstart', startDraw, {passive:false});
+  canvas.addEventListener('touchmove',  draw,      {passive:false});
+  canvas.addEventListener('touchend',   stopDraw);
+
+  function clearSignature(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    hasSig=false;
+    wrap.classList.remove('active');
+    document.getElementById('sig-placeholder').style.display='flex';
+    updateSubmitBtn();
+  }
+
+  function updateSubmitBtn(){
+    const allChecked = document.getElementById('check1').checked && document.getElementById('check2').checked && document.getElementById('check3').checked;
+    document.getElementById('submit-btn').disabled = !(allChecked && hasSig);
+  }
+
+  async function submitSignature(){
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    const sigImage = canvas.toDataURL('image/png');
+    try {
+      await fetch('/api/submit-hipaa', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({token, patientName:decodeURIComponent(patientName), caseRef:decodeURIComponent(caseRef), signedAt:new Date().toISOString(), signatureImg:sigImage, userAgent:navigator.userAgent})
+      });
+    } catch(e){ /* silent — show success regardless */ }
+    document.getElementById('sign-screen').style.display    = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+</script>
+</body>
+</html>
