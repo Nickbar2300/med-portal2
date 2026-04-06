@@ -4,10 +4,6 @@
   "description": "Rapid Records Azure Functions API",
   "main": "index.js",
   "scripts": {
-    "build": "echo No build required",
-    "start": "func start"
-  },
-  "dependencies": {
-    "@azure/functions": "^4.0.0"
+    "build": "echo No build required"
   }
 }
