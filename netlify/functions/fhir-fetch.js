@@ -22,7 +22,7 @@ exports.handler = async function (event) {
     try { body = JSON.parse(event.body); }
     catch(e) { return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
 
-    const { access_token, resource, url } = body || {};
+    const { access_token, resource, url, dateFrom, dateTo } = body || {};
     if (!access_token) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Missing access_token' }) };
 
     const ALLOWED = ['Patient', 'Coverage', 'ExplanationOfBenefit'];
@@ -30,16 +30,39 @@ exports.handler = async function (event) {
     let fetchUrl;
 
     if (url) {
-        if (!url.startsWith('https://sandbox.bluebutton.cms.gov')) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Invalid URL' }) };
+        if (!url.startsWith('https://sandbox.bluebutton.cms.gov')) {
+            return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Invalid URL' }) };
+        }
         fetchUrl = url;
     } else if (resource && ALLOWED.includes(resource)) {
-        fetchUrl = `${BASE}/${resource}/${resource === 'ExplanationOfBenefit' ? '?_count=50' : ''}`;
+        if (resource === 'ExplanationOfBenefit') {
+            // Build URL with date filters
+            const params = new URLSearchParams({ _count: '50' });
+            if (dateFrom) params.set('service-date', `ge${dateFrom}`);
+            if (dateTo)   params.set('service-date', `le${dateTo}`);
+            // If both dates, use billablePeriod range
+            if (dateFrom && dateTo) {
+                params.delete('service-date');
+                params.set('billablePeriod', `ge${dateFrom}`);
+                // CMS Blue Button uses _lastUpdated or service-date
+                // Use service-date with ge/le for date range
+                params.delete('billablePeriod');
+                params.set('service-date', `ge${dateFrom}`);
+                params.append('service-date', `le${dateTo}`);
+            }
+            fetchUrl = `${BASE}/ExplanationOfBenefit/?${params.toString()}`;
+        } else {
+            fetchUrl = `${BASE}/${resource}/`;
+        }
     } else {
         return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Invalid resource' }) };
     }
 
     try {
-        const result = await httpsGet(fetchUrl, { 'Authorization': `Bearer ${access_token}`, 'Accept': 'application/json' });
+        const result = await httpsGet(fetchUrl, {
+            'Authorization': `Bearer ${access_token}`,
+            'Accept': 'application/json'
+        });
         return { statusCode: result.status, headers: cors, body: result.body };
     } catch(err) {
         return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
