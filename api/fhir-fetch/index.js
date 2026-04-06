@@ -1,4 +1,3 @@
-const { app } = require('@azure/functions');
 const https = require('https');
 
 function httpsGet(url, headers) {
@@ -14,39 +13,36 @@ function httpsGet(url, headers) {
   });
 }
 
-app.http('fhir-fetch', {
-  methods: ['GET', 'POST', 'OPTIONS'],
-  authLevel: 'anonymous',
-  handler: async (request, context) => {
-    const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
-    if (request.method === 'OPTIONS') return { status: 200, headers: corsHeaders, body: '' };
+module.exports = async function (context, req) {
+  const headers = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+  if (req.method === 'OPTIONS') { context.res = { status: 200, headers, body: '' }; return; }
+  if (req.method !== 'POST') { context.res = { status: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) }; return; }
 
-    let parsed;
-    try { const text = await request.text(); parsed = JSON.parse(text); }
-    catch(e) { return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
+  let parsed;
+  try { parsed = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
+  catch(e) { context.res = { status: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }; return; }
 
-    const { access_token, resource, url } = parsed || {};
-    if (!access_token) return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing access_token' }) };
+  const { access_token, resource, url } = parsed || {};
+  if (!access_token) { context.res = { status: 400, headers, body: JSON.stringify({ error: 'Missing access_token' }) }; return; }
 
-    const ALLOWED = ['Patient', 'Coverage', 'ExplanationOfBenefit'];
-    const BASE_URL = 'https://sandbox.bluebutton.cms.gov/v2/fhir';
-    let fetchUrl;
+  const ALLOWED = ['Patient', 'Coverage', 'ExplanationOfBenefit'];
+  const BASE_URL = 'https://sandbox.bluebutton.cms.gov/v2/fhir';
+  let fetchUrl;
 
-    if (url) {
-      if (!url.startsWith('https://sandbox.bluebutton.cms.gov')) return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid URL' }) };
-      fetchUrl = url;
-    } else if (resource && ALLOWED.includes(resource)) {
-      fetchUrl = `${BASE_URL}/${resource}/${resource === 'ExplanationOfBenefit' ? '?_count=50' : ''}`;
-    } else {
-      return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid resource' }) };
-    }
-
-    try {
-      const result = await httpsGet(fetchUrl, { 'Authorization': `Bearer ${access_token}`, 'Accept': 'application/json' });
-      const data = JSON.parse(result.body);
-      return { status: result.status, headers: corsHeaders, body: JSON.stringify(data) };
-    } catch(err) {
-      return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: err.message }) };
-    }
+  if (url) {
+    if (!url.startsWith('https://sandbox.bluebutton.cms.gov')) { context.res = { status: 400, headers, body: JSON.stringify({ error: 'Invalid URL' }) }; return; }
+    fetchUrl = url;
+  } else if (resource && ALLOWED.includes(resource)) {
+    fetchUrl = `${BASE_URL}/${resource}/${resource === 'ExplanationOfBenefit' ? '?_count=50' : ''}`;
+  } else {
+    context.res = { status: 400, headers, body: JSON.stringify({ error: 'Invalid resource' }) }; return;
   }
-});
+
+  try {
+    const result = await httpsGet(fetchUrl, { 'Authorization': `Bearer ${access_token}`, 'Accept': 'application/json' });
+    const data = JSON.parse(result.body);
+    context.res = { status: result.status, headers, body: JSON.stringify(data) };
+  } catch(err) {
+    context.res = { status: 500, headers, body: JSON.stringify({ error: err.message }) };
+  }
+};
