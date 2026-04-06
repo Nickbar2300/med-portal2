@@ -1,18 +1,8 @@
 [build]
   functions = "netlify/functions"
+  publish = "."
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
-  conditions = {Role = ["admin"]}
-
-[[redirects]]
-  from = "/callback.html"
-  to = "/callback.html"
-  status = 200
-
-[[redirects]]
-  from = "/sign.html"
-  to = "/sign.html"
   status = 200
