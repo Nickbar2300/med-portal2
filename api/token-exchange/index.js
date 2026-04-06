@@ -1,4 +1,3 @@
-const { app } = require('@azure/functions');
 const https = require('https');
 const querystring = require('querystring');
 
@@ -15,54 +14,51 @@ function httpsPost(hostname, path, headers, body) {
   });
 }
 
-app.http('token-exchange', {
-  methods: ['GET', 'POST', 'OPTIONS'],
-  authLevel: 'anonymous',
-  handler: async (request, context) => {
-    const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
-    if (request.method === 'OPTIONS') return { status: 200, headers: corsHeaders, body: '' };
+module.exports = async function (context, req) {
+  const headers = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
 
-    let parsed;
-    try {
-      const text = await request.text();
-      parsed = JSON.parse(text);
-    } catch(e) {
-      return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON body' }) };
-    }
+  if (req.method === 'OPTIONS') { context.res = { status: 200, headers, body: '' }; return; }
+  if (req.method !== 'POST') { context.res = { status: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) }; return; }
 
-    const { code, code_verifier, redirect_uri } = parsed || {};
-    if (!code || !code_verifier || !redirect_uri) {
-      return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing parameters' }) };
-    }
-
-    const CLIENT_ID     = process.env.BB2_CLIENT_ID;
-    const CLIENT_SECRET = process.env.BB2_CLIENT_SECRET;
-
-    if (!CLIENT_ID || !CLIENT_SECRET) {
-      return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: 'BB2 credentials not configured' }) };
-    }
-
-    const formBody = querystring.stringify({
-      grant_type: 'authorization_code',
-      code, redirect_uri, code_verifier,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-    });
-
-    try {
-      const result = await httpsPost(
-        'sandbox.bluebutton.cms.gov',
-        '/v2/o/token/',
-        { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(formBody) },
-        formBody
-      );
-      context.log('BB2 status:', result.status);
-      let data;
-      try { data = JSON.parse(result.body); }
-      catch(e) { return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Non-JSON from BB2', raw: result.body.substring(0,200) }) }; }
-      return { status: result.status, headers: corsHeaders, body: JSON.stringify(data) };
-    } catch(err) {
-      return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: err.message }) };
-    }
+  // Handle both string and object body
+  let parsed;
+  try {
+    parsed = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch(e) {
+    context.res = { status: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) }; return;
   }
-});
+
+  const { code, code_verifier, redirect_uri } = parsed || {};
+  if (!code || !code_verifier || !redirect_uri) {
+    context.res = { status: 400, headers, body: JSON.stringify({ error: 'Missing parameters', got: { code: !!code, cv: !!code_verifier, ru: !!redirect_uri } }) }; return;
+  }
+
+  const CLIENT_ID     = process.env.BB2_CLIENT_ID;
+  const CLIENT_SECRET = process.env.BB2_CLIENT_SECRET;
+
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    context.res = { status: 500, headers, body: JSON.stringify({ error: 'BB2 credentials not configured' }) }; return;
+  }
+
+  const formBody = querystring.stringify({
+    grant_type: 'authorization_code',
+    code, redirect_uri, code_verifier,
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+  });
+
+  try {
+    const result = await httpsPost(
+      'sandbox.bluebutton.cms.gov', '/v2/o/token/',
+      { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(formBody) },
+      formBody
+    );
+    context.log('BB2 response status:', result.status);
+    let data;
+    try { data = JSON.parse(result.body); }
+    catch(e) { context.res = { status: 500, headers, body: JSON.stringify({ error: 'Non-JSON from BB2', raw: result.body.substring(0, 300) }) }; return; }
+    context.res = { status: result.status, headers, body: JSON.stringify(data) };
+  } catch(err) {
+    context.res = { status: 500, headers, body: JSON.stringify({ error: err.message }) };
+  }
+};
