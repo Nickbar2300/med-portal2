@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HIPAA Authorization — Marzzacco Niven & Associates</title>
+  <style>
+    :root{--navy:#1B2A4A;--red:#C41E3A;--gold:#C8962E;--light:#F4F6FA;--border:#DDE2EC;--text1:#1B2A4A;--text2:#5A6880;--text3:#8C97AA;--success:#1A7F4B;}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--text1);min-height:100vh;}
+    .header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+    .header-logo{width:36px;height:36px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px;flex-shrink:0;}
+    .header-text .firm{font-size:13px;font-weight:600;color:white;}
+    .header-text .sub{font-size:11px;color:rgba(255,255,255,0.5);}
+    .container{max-width:600px;margin:0 auto;padding:24px 16px 48px;}
+    .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:10px;}
+    .patient-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;border-top:3px solid var(--navy);}
+    .patient-name{font-size:17px;font-weight:700;margin-bottom:4px;}
+    .patient-meta{font-size:13px;color:var(--text2);}
+    .patient-ref{font-size:12px;color:var(--gold);font-weight:600;margin-top:6px;}
+    .hipaa-card{background:white;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;max-height:280px;overflow-y:auto;}
+    .hipaa-card h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--navy);}
+    .hipaa-card p{font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:10px;}
+    .hipaa-card strong{color:var(--text1);}
+    .consent-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;}
+    .consent-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .consent-item:last-child{border-bottom:none;padding-bottom:0;}
+    .consent-item input[type="checkbox"]{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--navy);cursor:pointer;}
+    .consent-item label{font-size:13px;line-height:1.6;color:var(--text1);cursor:pointer;}
+    .sig-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px;}
+    .sig-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+    .sig-label{font-size:13px;font-weight:600;}
+    .sig-clear{font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;border-radius:4px;}
+    .sig-canvas-wrap{border:2px dashed var(--border);border-radius:10px;background:var(--light);position:relative;overflow:hidden;touch-action:none;}
+    .sig-canvas-wrap.active{border-color:var(--navy);border-style:solid;}
+    canvas#sig-canvas{display:block;width:100%;height:160px;cursor:crosshair;}
+    .sig-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;color:var(--text3);pointer-events:none;display:flex;align-items:center;gap:6px;}
+    .sig-placeholder svg{width:16px;height:16px;fill:var(--text3);}
+    .btn-submit{width:100%;background:var(--navy);color:white;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+    .btn-submit:hover{background:#253d6b;}
+    .btn-submit:disabled{background:var(--text3);cursor:not-allowed;}
+    #success-screen{display:none;text-align:center;padding:48px 24px;}
+    .success-circle{width:80px;height:80px;background:rgba(26,127,75,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+    .success-circle svg{width:40px;height:40px;fill:var(--success);}
+    .success-title{font-size:22px;font-weight:700;margin-bottom:10px;}
+    .success-sub{font-size:14px;color:var(--text2);line-height:1.7;max-width:320px;margin:0 auto;}
+    #expired-screen{display:none;text-align:center;padding:48px 24px;}
+    .expired-circle{width:80px;height:80px;background:rgba(196,30,58,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+    .expired-circle svg{width:40px;height:40px;fill:var(--red);}
+    .footer{text-align:center;font-size:11px;color:var(--text3);margin-top:32px;line-height:1.8;}
+    .footer span{color:var(--red);font-weight:600;}
+  
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .container { padding: 0; }
+      .hipaa-card { max-height: 220px; font-size: 12px; }
+      .hipaa-card p { font-size: 12px; }
+      .consent-item label { font-size: 12px; }
+      .submit-btn { font-size: 15px; padding: 14px; }
+      .patient-name { font-size: 15px; }
+      h1 { font-size: 18px; }
+    }
+    * { box-sizing: border-box; }
+    input[type="checkbox"] { min-width: 20px; min-height: 20px; }
+    .submit-btn { min-height: 48px; }
+    canvas { touch-action: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">RR</div>
+  <div class="header-text">
+    <div class="firm">Marzzacco Niven & Associates</div>
+    <div class="sub">HIPAA Authorization Request</div>
+  </div>
+</div>
+
+<!-- Signing form -->
+<div id="sign-screen">
+  <div class="container">
+
+    <div class="section-title">Your Information</div>
+    <div class="patient-card">
+      <div class="patient-name" id="patient-name">Patient</div>
+      <div class="patient-meta">Authorization request from Marzzacco Niven & Associates</div>
+      <div class="patient-ref" id="patient-ref"></div>
+    </div>
+
+    <div class="section-title">Authorization for Release of Health Information</div>
+    <div class="hipaa-card">
+      <h3>HIPAA Compliant Release of Records Authorization</h3>
+      <p>I authorize the disclosure of all protected information to my Attorneys, <strong>Marzzacco Niven &amp; Associates</strong>, or their authorized representatives, for the purpose of review and evaluation in connection with a legal claim. I expressly request that the designated records custodian of all covered entities under HIPAA identified above disclose full and complete protected medical information including the following:</p>
+      <p>&#8226; All medication records, including in-patient, out-patient and emergency room treatment, all clinical charts, reports, order sheets, progress notes, nurse&#39;s notes, clinic records, treatment plans, admission records, discharge summaries, requests for and reports of consultations, documents, correspondence, test results, statements, questionnaires/histories, office and doctor&#39;s handwritten notes, and records received by other physicians.</p>
+      <p>&#8226; All physical, occupational and rehab requests, consultations and progress notes.</p>
+      <p>&#8226; All disability records.</p>
+      <p>&#8226; All employment or wage records.</p>
+      <p>&#8226; All autopsy, laboratory, histology, cytology, pathology, radiology, CT scan, MRI, MRA, EMG, nerve conduction study, echocardiogram and cardiac catheterization reports. All radiology films, mammograms, myelograms, CT scans, photographs, bone scans, pathology/cytology/histology/autopsy/immunohistochemistry specimens, cardiac catheterization videos/CDs/films/reels, and echocardiogram videos.</p>
+      <p>&#8226; All pharmacy/prescription records including NDC numbers and drug information handouts/monographs.</p>
+      <p>&#8226; All billing records including all statements, itemized bills, and records of billing to third party payers and payment or denial of benefits.</p>
+      <p>&#8226; All personnel/education records.</p>
+      <p>&#8226; All insurance records.</p>
+      <p>&#8226; All documents from the Bureau of Worker&#39;s Compensation.</p>
+      <p><strong>Purpose:</strong> This protected health information is disclosed for the following purposes: Investigation and/or prosecution of my personal injury claim/potential lawsuit.</p>
+      <p>This authorization is in compliance with the federal consent requirements for release of alcohol or substance abuse records of 42 C.F.R. &sect; 2.31, the restrictions of which have been specifically considered and expressly waived.</p>
+      <p><strong>Right to Revoke:</strong> I acknowledge that I have the right to revoke this authorization, in writing, by sending written notification to the above referenced address. However, I understand that any actions already taken in reliance on this authorization cannot be reversed, and my revocation will not affect those actions.</p>
+      <p><strong>Re-disclosure:</strong> I acknowledge the potential for information disclosed pursuant to this authorization to be subject to redisclosure by the recipient and no longer be protected under 45 C.F.R. &sect; 164.508.</p>
+      <p>I understand that the covered entity to which this authorization is directed may not condition treatment, payment, enrollment or eligibility benefits on whether or not I sign the authorization.</p>
+      <p><em>Any facsimile, copy or photocopy of the authorization shall authorize you to release the records herein.</em></p>
+      <p><strong>This authorization shall be in force and effect until two years from date of execution at which time this authorization expires.</strong></p>
+    </div>
+
+    <div class="section-title">I confirm that</div>
+    <div class="consent-card">
+      <div class="consent-item">
+        <input type="checkbox" id="check1" onchange="updateSubmitBtn()"/>
+        <label for="check1">I am the patient named above, or their legally authorized representative, and I have the authority to sign this authorization</label>
+      </div>
+      <div class="consent-item">
+        <input type="checkbox" id="check2" onchange="updateSubmitBtn()"/>
+        <label for="check2">I have read and fully understand this HIPAA Compliant Release of Records Authorization, including my right to revoke it in writing at any time</label>
+      </div>
+      <div class="consent-item">
+        <input type="checkbox" id="check3" onchange="updateSubmitBtn()"/>
+        <label for="check3">I voluntarily authorize the disclosure of my protected health information to Marzzacco Niven &amp; Associates for the purpose of investigation and/or prosecution of my personal injury claim/potential lawsuit</label>
+      </div>
+    </div>
+
+    <div class="section-title">Your Signature</div>
+    <div class="sig-card">
+      <div class="sig-header">
+        <div class="sig-label">Sign with your finger below</div>
+        <button class="sig-clear" onclick="clearSignature()">Clear</button>
+      </div>
+      <div class="sig-canvas-wrap" id="sig-wrap">
+        <canvas id="sig-canvas"></canvas>
+        <div class="sig-placeholder" id="sig-placeholder">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          Sign here
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;">By signing you agree to the HIPAA authorization above. Date: <span id="sign-date"></span></div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" disabled onclick="submitSignature()">Submit Authorization</button>
+
+    <div class="footer">
+      This request was sent by <span>Marzzacco Niven & Associates</span><br>
+      Harrisburg, PA · (717) 231-1640 · klnivenlaw.com<br>
+      Powered by Rapid Records · HIPAA Compliant
+    </div>
+  </div>
+</div>
+
+<!-- Success -->
+<div id="clear-screen" style="display:none;text-align:center;padding:48px 24px;">
+      <div style="width:80px;height:80px;background:rgba(0,102,204,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
+        <svg viewBox="0 0 24 24" fill="#0066CC" style="width:40px;height:40px;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+      </div>
+      <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:12px;">HIPAA Form Signed ✓</div>
+      <div style="font-size:15px;color:#555;margin-bottom:32px;line-height:1.6;">One more step — please verify your identity with CLEAR so we can securely access your medical records.</div>
+      <div style="background:#f0f6ff;border:1px solid #cce0ff;border-radius:12px;padding:20px;margin-bottom:28px;text-align:left;">
+        <div style="font-size:13px;font-weight:600;color:#0066CC;margin-bottom:8px;">What to expect:</div>
+        <div style="font-size:13px;color:#444;line-height:1.8;">
+          📱 Takes about 60 seconds on your phone<br>
+          🪪 Have your driver's license or passport ready<br>
+          🤳 You'll take a quick selfie to match your ID<br>
+          🔒 Your data is encrypted and secure
+        </div>
+      </div>
+      <button id="clear-btn" onclick="startClearVerification()" style="width:100%;padding:16px;background:#0066CC;color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+        Verify Identity with CLEAR →
+      </button>
+      <div id="clear-error" style="display:none;color:#DC2626;font-size:13px;margin-bottom:10px;padding:8px 12px;background:#FEF2F2;border-radius:8px;"></div>
+      <div id="clear-checking" style="display:none;text-align:center;padding:16px;color:#0066CC;font-size:14px;">
+        <div style="width:32px;height:32px;border:3px solid #0066CC;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+        Confirming your verification…
+      </div>
+      <div style="font-size:12px;color:#888;">Powered by CLEAR · Same trusted identity used at airports nationwide</div>
+    </div>
+
+    <div id="success-screen">
+  <div class="container">
+    <div class="success-circle"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+    <div class="success-title">Authorization Submitted</div>
+    <div class="success-sub">Thank you. Your signed HIPAA authorization has been securely received by Marzzacco Niven & Associates. You may close this window.</div>
+    <div style="margin-top:32px;font-size:12px;color:var(--text3);">Submitted on <span id="submitted-date"></span><br>Powered by Rapid Records</div>
+  </div>
+</div>
+
+<!-- Expired -->
+<div id="expired-screen">
+  <div class="container">
+    <div class="expired-circle"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+    <div class="success-title" style="color:var(--red);">Link Expired</div>
+    <div class="success-sub">This signing link has expired or is no longer valid. Please contact Marzzacco Niven & Associates to request a new link.<br><br><strong>(717) 231-1640</strong></div>
+  </div>
+</div>
+
+<script>
+  const params      = new URLSearchParams(window.location.search);
+  const token       = params.get('token');
+  const patientName = params.get('name')  || '';
+  const caseRef     = params.get('ref')   || '';
+  const expiresAt   = params.get('exp')   || '';
+  const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('sign-date').textContent = today;
+  document.getElementById('submitted-date').textContent = today;
+  if(patientName) document.getElementById('patient-name').textContent = decodeURIComponent(patientName);
+  if(caseRef)     document.getElementById('patient-ref').textContent  = 'Case Ref: ' + decodeURIComponent(caseRef);
+  if(!token || (expiresAt && Date.now() > parseInt(expiresAt))){
+    document.getElementById('sign-screen').style.display    = 'none';
+    document.getElementById('expired-screen').style.display = 'block';
+  }
+
+  // Canvas
+  const canvas = document.getElementById('sig-canvas');
+  const ctx    = canvas.getContext('2d');
+  const wrap   = document.getElementById('sig-wrap');
+  let drawing  = false, hasSig = false;
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr  = window.devicePixelRatio || 1;
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#1B2A4A';
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    if(e.touches) return {x:e.touches[0].clientX-rect.left, y:e.touches[0].clientY-rect.top};
+    return {x:e.clientX-rect.left, y:e.clientY-rect.top};
+  }
+  function startDraw(e){e.preventDefault();drawing=true;const p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);wrap.classList.add('active');document.getElementById('sig-placeholder').style.display='none';}
+  function draw(e){if(!drawing)return;e.preventDefault();const p=getPos(e);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);hasSig=true;updateSubmitBtn();}
+  function stopDraw(){drawing=false;ctx.beginPath();}
+
+  canvas.addEventListener('mousedown',  startDraw);
+  canvas.addEventListener('mousemove',  draw);
+  canvas.addEventListener('mouseup',    stopDraw);
+  canvas.addEventListener('mouseleave', stopDraw);
+  canvas.addEventListener('touchstart', startDraw, {passive:false});
+  canvas.addEventListener('touchmove',  draw,      {passive:false});
+  canvas.addEventListener('touchend',   stopDraw);
+
+  function clearSignature(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    hasSig=false;
+    wrap.classList.remove('active');
+    document.getElementById('sig-placeholder').style.display='flex';
+    updateSubmitBtn();
+  }
+
+  function updateSubmitBtn(){
+    const allChecked = document.getElementById('check1').checked && document.getElementById('check2').checked && document.getElementById('check3').checked;
+    document.getElementById('submit-btn').disabled = !(allChecked && hasSig);
+  }
+
+  async function submitSignature(){
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    const sigImage = canvas.toDataURL('image/png');
+    try {
+      await fetch('/.netlify/functions/submit-hipaa', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({token, patientName:decodeURIComponent(patientName), caseRef:decodeURIComponent(caseRef), signedAt:new Date().toISOString(), signatureImg:sigImage, userAgent:navigator.userAgent})
+      });
+    } catch(e){ /* silent — show success regardless */ }
+    document.getElementById('sign-screen').style.display    = 'none';
+    document.getElementById('clear-screen').style.display   = 'block';
+    window.scrollTo(0,0);
+  }
+
+  async function startClearVerification() {
+    const btn = document.getElementById('clear-btn');
+    btn.disabled = true;
+    btn.textContent = 'Starting verification…';
+
+    try {
+      const resp = await fetch('/.netlify/functions/clear-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          token,
+          patientName: decodeURIComponent(patientName || ''),
+          caseRef: decodeURIComponent(caseRef || ''),
+          patientPhone: '',
+          patientEmail: ''
+        })
+      });
+
+      const data = await resp.json();
+
+      if (data.success && data.verificationUrl) {
+        // Store session ID so we can check status on return
+        sessionStorage.setItem('clear_session_id', data.sessionId);
+        sessionStorage.setItem('clear_portal_token', token);
+        // Redirect to CLEAR verification
+        window.location.href = data.verificationUrl;
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Verify Identity with CLEAR →';
+        document.getElementById('clear-error').textContent = data.error || 'Failed to start verification. Please try again.';
+        document.getElementById('clear-error').style.display = 'block';
+      }
+    } catch(err) {
+      btn.disabled = false;
+      btn.textContent = 'Verify Identity with CLEAR →';
+      document.getElementById('clear-error').textContent = 'Connection error. Please try again.';
+      document.getElementById('clear-error').style.display = 'block';
+    }
+  }
+
+  // Check if returning from CLEAR verification
+  (async function checkClearReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const isClearReturn = params.get('clear_return');
+    
+    if (isClearReturn === '1') {
+      const sessionId = sessionStorage.getItem('clear_session_id');
+      const portalToken = sessionStorage.getItem('clear_portal_token');
+
+      if (sessionId) {
+        // Show checking screen
+        document.getElementById('sign-screen').style.display  = 'none';
+        document.getElementById('clear-screen').style.display = 'block';
+        document.getElementById('clear-btn').style.display    = 'none';
+        document.getElementById('clear-checking').style.display = 'block';
+
+        try {
+          const resp = await fetch('/.netlify/functions/clear-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'check', sessionId })
+          });
+          const data = await resp.json();
+
+          if (data.verified) {
+            // Clear session storage
+            sessionStorage.removeItem('clear_session_id');
+            sessionStorage.removeItem('clear_portal_token');
+            // Show success
+            document.getElementById('clear-screen').style.display   = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+            window.scrollTo(0,0);
+            // Clean URL
+            window.history.replaceState({}, '', '/sign.html?token=' + (portalToken||''));
+          } else {
+            // Verification failed or pending
+            document.getElementById('clear-checking').style.display = 'none';
+            document.getElementById('clear-btn').style.display      = 'block';
+            document.getElementById('clear-btn').disabled           = false;
+            document.getElementById('clear-btn').textContent        = 'Try Verification Again →';
+            document.getElementById('clear-error').textContent      = 'Verification was not completed. Please try again.';
+            document.getElementById('clear-error').style.display    = 'block';
+          }
+        } catch(err) {
+          document.getElementById('clear-checking').style.display = 'none';
+          document.getElementById('clear-btn').style.display      = 'block';
+          document.getElementById('clear-error').textContent      = 'Could not confirm verification. Please try again.';
+          document.getElementById('clear-error').style.display    = 'block';
+        }
+      }
+    }
+  })();
+</script>
+</body>
+</html>
